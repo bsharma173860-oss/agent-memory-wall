@@ -1,0 +1,28 @@
+\section{Correct answers per kilowatt-hour}
+\label{sec:accuracy}
+
+Energy per token says nothing about whether an agent still gets its tasks right. Caching should not change
+outputs in principle, but we did not assume runs with and without it are identical, so we measured accuracy directly on 400 graded multi-turn tasks of BFCL~v4~\cite{bfcl2025} (base and long-context), with the benchmark's own grader and Qwen3-32B on vLLM, and recorded the GPU energy of each whole run
+(Table~\ref{tab:bfcl}).
+
+\begin{table}[t]
+\centering\small
+\caption{BFCL v4 multi-turn, Qwen3-32B on vLLM, 400 tasks (200 base, 200 long-context), 100 at a time, one round. Correct: total (base\,/\,long-context). Per kWh: correct tasks per kWh of GPU energy.}
+\label{tab:bfcl}
+\begin{tabular}{lrrrr}
+\toprule
+ & Correct & Time & Energy & Per kWh \\
+ & & (min) & (kWh) & \\
+\midrule
+GPU cache & 204 (113\,/\,91) & 64 & 0.619 & 330 \\
+no cache & 201 (120\,/\,81) & 129 & 1.239 & 162 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Accuracy differed by 3 of 400 tasks (204 against 201), with category-level differences of 7--10 tasks in opposite
+directions; with one round we cannot separate a cache effect from run-to-run variation. With the cache the same graded work took half
+the time and half the GPU energy, so it produced 2.0$\times$ the correct answers per kWh. We had predicted equal accuracy
+within two points and at least 20\% less energy per correct task; the energy per correct task fell by 51\%. A second
+round was dropped for budget reasons. In both runs 23--24 long-context tasks were rejected by the engine because the
+conversation exceeded the 40,960-token context (HTTP 400) and were counted as incorrect, which lowers absolute accuracy for both policies alike.

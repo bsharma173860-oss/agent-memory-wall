@@ -1,0 +1,21 @@
+[
+ {
+  "name": "sglang-host160-formula-rerun",
+  "engine": "sglang",
+  "policy": "offload+formula",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "160"
+  ],
+  "admit": {
+   "mode": "formula",
+   "turns": 8,
+   "safety": 0.9,
+   "growth": 600,
+   "interval": 2,
+   "capacity": 610351
+  }
+ }
+]

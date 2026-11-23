@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+"""A stand-in for nvidia-smi on AMD GPUs, put first on PATH by gate-kit/run_kit.py only when there is no nvidia-smi.
+
+The paper's scripts ask nvidia-smi three things: memory in use (to wait for a free GPU), temperature (to start each
+step from a settled card) and the card's name. This answers those from rocm-smi's JSON output, and nothing else.
+Not tested on an MI300X by us: if rocm-smi's output differs, the waits and the temperature are skipped, not the run.
+"""
+import json, re, subprocess, sys
+
+args = sys.argv[1:]
+idx = args[args.index("-i") + 1] if "-i" in args else "0"
+q = next((x.split("=", 1)[1] for x in args if x.startswith("--query-gpu=")), "")
+
+
+def rocm(*flags):
+    try:
+        out = subprocess.run(["rocm-smi", *flags, "--json"], capture_output=True, text=True, timeout=10).stdout
+        d = json.loads(out)
+        return d.get(f"card{idx}") or next(iter(d.values()), {})
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def first(d, pattern):
+    return next((v for k, v in d.items() if re.search(pattern, k, re.I)), None)
+
+
+vals = []
+for field in [f.strip() for f in q.split(",") if f.strip()]:
+    if field == "memory.used":
+        v = first(rocm("--showmeminfo", "vram"), r"VRAM Total Used")
+        vals.append(str(int(int(v) / 2**20)) if v else "")
+    elif field == "memory.total":
+        v = first(rocm("--showmeminfo", "vram"), r"VRAM Total Memory")
+        vals.append(str(int(int(v) / 2**20)) if v else "")
+    elif field == "temperature.gpu":
+        d = rocm("--showtemp")
+        v = first(d, r"junction") or first(d, r"edge")
+        vals.append(str(v) if v else "")
+    elif field == "name":
+        vals.append(str(first(rocm("--showproductname"), r"Card (series|model)") or "AMD GPU"))
+    else:
+        vals.append("")
+if "noheader" not in ",".join(args):
+    print(q)
+print(", ".join(vals))

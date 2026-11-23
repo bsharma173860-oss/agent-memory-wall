@@ -1,0 +1,52 @@
+[
+ {
+  "name": "sglang-host160-formula-real",
+  "engine": "sglang",
+  "policy": "offload+formula",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "160"
+  ],
+  "admit": {
+   "mode": "formula",
+   "turns": 4,
+   "safety": 0.9,
+   "growth": 300,
+   "interval": 2,
+   "capacity": 610351,
+   "stat": "mean",
+   "shared": 1500
+  }
+ },
+ {
+  "name": "sglang-host80wb-real",
+  "engine": "sglang",
+  "policy": "offload-wb",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "80",
+   "--hicache-write-policy",
+   "write_back"
+  ]
+ },
+ {
+  "name": "vllm-formula-mean-real",
+  "engine": "vllm",
+  "policy": "formula-prefix-aware",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [],
+  "admit": {
+   "mode": "formula",
+   "turns": 4,
+   "safety": 0.9,
+   "interval": 2,
+   "stat": "mean",
+   "shared": 1500,
+   "growth": 300
+  }
+ }
+]

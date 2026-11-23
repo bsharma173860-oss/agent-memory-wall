@@ -1,0 +1,10 @@
+[
+  {"name": "vllm-gpu",       "engine": "vllm",   "policy": "gpu-only",  "python": "/workspace/venv-vllm/bin/python",   "flags": []},
+  {"name": "vllm-offload",   "engine": "vllm",   "policy": "offload",   "python": "/workspace/venv-vllm/bin/python",
+   "flags": ["--kv-offloading-size", "80", "--kv-offloading-backend", "native"]},
+  {"name": "vllm-nocache",   "engine": "vllm",   "policy": "recompute", "python": "/workspace/venv-vllm/bin/python",   "flags": ["--disable-prefix-caching"]},
+  {"name": "sglang-gpu",     "engine": "sglang", "policy": "gpu-only",  "python": "/workspace/venv-sglang/bin/python", "flags": []},
+  {"name": "sglang-offload", "engine": "sglang", "policy": "offload",   "python": "/workspace/venv-sglang/bin/python",
+   "flags": ["--enable-hierarchical-cache", "--hicache-size", "80"]},
+  {"name": "sglang-nocache", "engine": "sglang", "policy": "recompute", "python": "/workspace/venv-sglang/bin/python", "flags": ["--disable-radix-cache"]}
+]

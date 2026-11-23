@@ -1,0 +1,20 @@
+\begin{abstract}
+An AI agent alternates between model calls and tool calls. While a tool runs, the serving engine keeps the agent's
+key--value (KV) cache only if nothing else needs the memory; when it is evicted, the next call recomputes the whole
+context. We measure what this costs in GPU energy on an H200 with vLLM and SGLang, three Qwen3 models (32B, 30B-A3B
+and 8B) and four workloads: synthetic sessions, recorded SWE-agent trajectories, replayed samples of production
+tool-agent traffic from Kimi, and graded BFCL multi-turn tasks. Every prediction was registered before its run.
+
+We report four results. First, on synthetic sessions, once the agents' working set exceeds the cache by a factor of 1.2--2.2, hits collapse;
+past that point energy per turn is within 0.01--1.6\% of running without a cache. With
+Qwen3-32B and 5\,s pauses the collapse comes between 16 and 32 sessions of about 11k tokens and between 8 and 16 of
+about 27k. Second, restoring a prompt's KV from host memory takes about 1/110 to 1/220 of the above-idle GPU energy of
+recomputing it. Third, on a 1/4 sample of the production trace, which overloads the GPU, a 160\,GB host tier let the GPU
+finish every request (85--86\% with the GPU cache) and process 16--18\% more prompt tokens for about the same energy, in two
+time windows; on a lighter 1/8 sample the tier saved under 1\%. Given measured hit rates, a one-parameter model predicts the busy card's energy per
+token to within about 1\%. Fourth, on synthetic sessions, an admission gate, switched on only when the working set
+exceeds 1.2 times the cache, cost no energy below that point; above it, in two 10-minute runs, it served every session,
+completed 48--62\% more turns and cut energy per turn by 42--50\%, at the price of minutes of queueing at
+admission. On BFCL, accuracy with and without the cache differed by 3 of 400 tasks, and the
+cache doubled correct answers per kWh. All energy is GPU board energy.
+\end{abstract}

@@ -1,0 +1,12 @@
+arxiv/
+arxiv-source.tar.gz
+arxiv-preview.pdf
+__pycache__/
+tex/*.aux
+tex/*.log
+tex/*.out
+tex/*.bbl
+tex/*.blg
+tex/*.fls
+tex/*.fdb_latexmk
+tex/*.pdf

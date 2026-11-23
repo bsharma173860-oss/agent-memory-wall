@@ -1,0 +1,31 @@
+\section{Pre-registered hypotheses and verdicts}
+\label{app:prereg}
+
+Each hypothesis in Table~\ref{tab:prereg} was written into a plan document, most with a numeric threshold (H4 and H8 had none), before the runs that tested it.
+The plan is under version control; the time given is that of the commit that added the prediction, which precedes the
+first run that tested it. Several predictions were added during the study, after earlier runs, and the plan says which
+results had been seen when each was written. Verdicts were added in later commits; no prediction was edited after its first run.
+``Not supported'' means the registered threshold was missed, even when the direction was right; ``Partly'' means
+some clauses or cells held and others did not. The shared-prefix formula (7~Nov 02:43) was written after H16
+and H21 and was the formula their runs used.
+\input{prereg_table}
+
+
+
+\section{Derivation details}
+\label{app:derive}
+
+\paragraph{FLOP per token.} Qwen3-32B has hidden size 5,120, 64 layers, 64 query and 8 KV heads of dimension 128, and an
+MLP of width 25,600; its 31.2 billion non-embedding parameters give 62.4\,GFLOP per token. Attention scores and the
+weighted sum of values each cost $2\times64\times128$ FLOP per layer per earlier token, together 2.10\,MFLOP over 64 layers.
+
+\paragraph{Random-order cliff.} As a mean-field approximation, let a session be away for exactly one mean cycle while
+each of the other $N-1$ sessions returns as a Poisson process with that mean interval. Each is then touched during the
+absence with probability $1-1/e\approx0.63$, and the session survives if $s(1 + 0.63(N-1)) \le C$, which gives
+$N^\ast \approx 1 + (C/s-1)/0.63$: a factor that approaches $1/(1-1/e)\approx1.58$ over the cyclic case $N^\ast=C/s$ as
+$C/s$ grows (1.56 at $C/s=23$). With exponential absences the expected share touched falls to $1/2$
+and the hit rate declines gradually; our measured drops are sharper than that.
+
+\paragraph{Projection for long contexts.} For Qwen3-32B in BF16 ($b_{\text{KV}}=262{,}144$\,bytes, 65.5\,GB of weights,
+$u=0.9$), Eq.~\eqref{eq:cliff} gives $C\approx234$k tokens at 141\,GB (the engine reported 245k), 409k at 192\,GB and
+739k at 288\,GB; with $s=68$k tokens and $\kappa=1.2$--2.2, it gives 4--8, 7--13 and 13--24 sessions.

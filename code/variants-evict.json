@@ -1,0 +1,4 @@
+[
+  {"name": "sglang-lfu",  "engine": "sglang", "policy": "gpu-only-lfu",  "python": "/workspace/venv-sglang/bin/python", "flags": ["--radix-eviction-policy", "lfu"]},
+  {"name": "sglang-slru", "engine": "sglang", "policy": "gpu-only-slru", "python": "/workspace/venv-sglang/bin/python", "flags": ["--radix-eviction-policy", "slru"]}
+]

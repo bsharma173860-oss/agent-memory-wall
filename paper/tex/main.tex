@@ -1,0 +1,56 @@
+\pdfoutput=1
+\documentclass[10pt,twocolumn]{article}
+\usepackage[letterpaper,margin=0.75in,columnsep=0.25in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{url}\def\UrlBreaks{\do\/}\def\UrlBigBreaks{}\def\UrlNoBreaks{\do\:\do\(\do\[\do\{\do\<}
+\hyphenation{Paged-Attention Radix-Attention Cached-Attention LMCache Mooncake EfficientAgent CONCUR TokenCake HotCarbon}
+\makeatletter\setlength{\@fptop}{0pt}\makeatother
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={The Agent Memory Wall: Measuring and Managing the GPU Energy of KV Caches for AI Agents},
+  pdfauthor={Bharat Bhushan Sharma}}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+\captionsetup{font=small,labelfont=bf}
+\setlength{\tabcolsep}{4pt}
+\raggedbottom
+
+\newcommand{\Cgpu}{C}
+\newcommand{\WC}{W/C}
+
+\title{\Large\bfseries The Agent Memory Wall:\\ Measuring and Managing the GPU Energy of KV Caches for AI Agents}
+\author{Bharat Bhushan Sharma\\ \small PHENEX TECHNOLOGIES INC (WattOps), Vancouver, Canada\\ \small bharat@wattops.dev}
+\date{}
+
+\begin{document}
+\maketitle
+
+\input{abstract}
+\input{intro}
+\input{setup}
+\input{model}
+\input{results_cost}
+\input{results_cliff}
+\input{results_tiers}
+\input{results_production}
+\input{results_control}
+\input{results_accuracy}
+\input{related}
+\input{discussion}
+
+\bibliographystyle{plainnat}
+\bibliography{../references}
+
+\appendix
+\onecolumn
+\input{appendix}
+
+\end{document}

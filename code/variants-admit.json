@@ -1,0 +1,6 @@
+[
+  {"name": "vllm-admit16x4", "engine": "vllm", "policy": "admission", "python": "/workspace/venv-vllm/bin/python", "flags": [],
+   "admit": {"slots": 16, "turns": 4}},
+  {"name": "vllm-admit16x8", "engine": "vllm", "policy": "admission", "python": "/workspace/venv-vllm/bin/python", "flags": [],
+   "admit": {"slots": 16, "turns": 8}}
+]

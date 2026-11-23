@@ -1,0 +1,4 @@
+[
+  {"name": "sglang-gpu-control", "engine": "sglang", "python": "/workspace/venv-sglang/bin/python", "flags": []},
+  {"name": "sglang-host160", "engine": "sglang", "python": "/workspace/venv-sglang/bin/python", "flags": ["--enable-hierarchical-cache", "--hicache-size", "160"]}
+]

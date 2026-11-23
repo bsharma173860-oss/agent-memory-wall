@@ -1,0 +1,68 @@
+\begin{figure*}[t]
+\centering
+\frenchspacing
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=3pt, minimum height=0.68cm,
+    execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
+  dark/.style={box, fill=black, text=white},
+  grey/.style={box, fill=black!12},
+  light/.style={box, fill=white},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  lab/.style={font=\scriptsize\itshape, text=black!60, align=center,
+    execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
+  head/.style={font=\scriptsize\bfseries, align=left}
+]
+% ---------- agents
+\node[head] at (1.3,2.65) {AGENTS ($N$ sessions)};
+\node[light, text width=2.4cm] (a1) at (1.3,1.8) {model call $\rightarrow$ tool};
+\node[light, text width=2.4cm] (a2) at (1.3,0.9) {model call $\rightarrow$ tool};
+\node[light, text width=2.4cm] (a3) at (1.3,0.0) {model call $\rightarrow$ tool};
+\node at (1.3,-0.6) {$\vdots$};
+\node[light, text width=2.4cm] (an) at (1.3,-1.3) {model call $\rightarrow$ tool};
+\node[lab, anchor=north, text width=3.0cm] at ([yshift=-0.12cm]an.south) {each call resends the whole history ($s$~tokens); tool pauses last seconds to minutes};
+
+% ---------- gate
+\node[head] at (5.0,2.65) {ADMISSION GATE};
+\node[dark, text width=2.3cm] (all) at (5.0,1.8) {admit all $N$};
+\node[diamond, draw, aspect=2.2, inner sep=0.5pt, align=center, fill=white, font=\scriptsize] (dec) at (5.0,0.45)
+  {$S+N(\bar s-S)\le\theta C$?};
+\node[grey, text width=2.3cm] (k) at (5.0,-1.3) {admit $K$ (Eq.~\eqref{eq:gate});\\others wait};
+\draw[arr] (dec.north) -- node[left, font=\scriptsize]{yes} (all.south);
+\draw[arr] (dec.south) -- node[left, font=\scriptsize]{no} (k.north);
+\draw[arr] (a1.east) -- ++(0.35,0) |- (dec.west);
+\draw[arr] (an.east) -- ++(0.35,0) |- (dec.west);
+\draw[thick] (a2.east) -- ++(0.35,0);
+\draw[thick] (a3.east) -- ++(0.35,0);
+
+% ---------- engine
+\node[head] at (11.6,2.65) {SERVING ENGINE (vLLM or SGLang) ON ONE H200};
+\node[light, text width=1.2cm] (lk) at (8.15,0.45) {prefix\\lookup};
+\draw[arr] (all.east) -- ++(0.55,0) |- (lk.west);
+\draw[arr] (k.east) -- ++(0.55,0) |- (lk.west);
+
+\node[dark, text width=3.6cm] (hit) at (11.6,1.8) {GPU hit (HBM, capacity $C$)\\[-1pt]{\scriptsize 0--0.3\,mJ per token}};
+\node[grey, text width=3.6cm] (res) at (11.6,0.45) {restore from host tier (host memory)\\[-1pt]{\scriptsize 0.27--0.68\,mJ per token}};
+\node[light, text width=3.6cm, very thick] (rec) at (11.6,-0.9) {recompute (prefill)\\[-1pt]{\scriptsize 56--73\,mJ per token}};
+\draw[arr] (lk.east) -- ++(0.45,0) |- (hit.west);
+\draw[arr] (lk.east) -- (res.west);
+\draw[arr] (lk.east) -- ++(0.45,0) |- (rec.west);
+
+\node[light, text width=1.3cm] (out) at (15.9,0.45) {decode\\answer};
+\draw[arr] (hit.east) -- ++(0.45,0) |- (out.west);
+\draw[arr] (res.east) -- (out.west);
+\draw[arr] (rec.east) -- ++(0.45,0) |- (out.west);
+
+\node[lab, anchor=north, text width=5.4cm] (meter) at ([yshift=-0.12cm]rec.south) {all three paths metered as GPU board energy (NVML counter, read every 0.1\,s)};
+
+% ---------- cliff callout
+\node[draw, dashed, rounded corners=2pt, align=left, font=\scriptsize, text width=8.3cm, fill=black!4] at (11.6,-3.2)
+{\textbf{The cliff.} Without the gate, once $W=Ns$ exceeds $\kappa C$ ($\kappa\approx1.2$--2.2), LRU evicts nearly every
+session before it returns, so every turn takes the recompute path and costs what it would with no cache.};
+\end{tikzpicture}
+\caption{What happens to one agent turn. Agents resend their history after each tool call. The admission gate
+(Section~\ref{sec:control}) admits every session while the working set fits under $\theta C$ and only $K$ sessions
+otherwise ($S$, $\bar s$, $\theta$, $\kappa$ and $K$ are defined in Section~\ref{sec:model}). In the engine, each prompt token takes one of three paths whose above-idle GPU energy we measured
+(Section~\ref{sec:cost}): its KV is still in GPU memory, in a host tier, or gone. HBM: the GPU's high-bandwidth memory; LRU: least-recently-used eviction; NVML: NVIDIA Management Library.}
+\label{fig:arch}
+\end{figure*}

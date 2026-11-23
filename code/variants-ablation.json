@@ -1,0 +1,5 @@
+[{"name": "sglang-default-ab", "engine": "sglang", "python": "/workspace/venv-sglang/bin/python", "flags": []},
+ {"name": "sglang-lpm", "engine": "sglang", "python": "/workspace/venv-sglang/bin/python", "flags": ["--schedule-policy", "lpm"]},
+ {"name": "sglang-chunk16k", "engine": "sglang", "python": "/workspace/venv-sglang/bin/python", "flags": ["--chunked-prefill-size", "16384"]},
+ {"name": "sglang-maxrun256", "engine": "sglang", "python": "/workspace/venv-sglang/bin/python", "flags": ["--max-running-requests", "256"]},
+ {"name": "sglang-tuned-ab", "engine": "sglang", "python": "/workspace/venv-sglang/bin/python", "flags": ["--chunked-prefill-size", "16384", "--max-running-requests", "256", "--schedule-policy", "lpm"]}]

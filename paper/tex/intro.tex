@@ -1,0 +1,67 @@
+\section{Introduction}
+
+An AI agent sends its whole history to a language model, waits for an answer, runs a tool, appends the result and
+calls the model again. Each call repeats a long prefix the server has already processed. Serving engines keep the
+attention keys and values of that prefix (the KV cache) so that the next call does not recompute them, and the saving
+is large: for a 32-billion-parameter model we measure 56--73\,mJ of above-idle GPU energy per recomputed prompt token and
+almost nothing per cached one.
+
+The cache has a weakness that agents expose. The engine does not know that an agent has gone to run a tool or how long
+it will be away, so it keeps KV by recency and evicts the least recently used entry when memory runs out. Once the agents'
+working set exceeds the cache by a factor between 1.2 and 2.2, depending on how long they pause, hits collapse until nearly every agent's KV is evicted before it returns. Prior work has named this collapse
+(``middle-phase thrashing'' in CONCUR~\cite{chen2026concur}), located it~\cite{he2026robot,lu2026metastability} and
+shown that a host-memory tier helps only when it holds the agents' working set~\cite{shao2026efficientagent}. All of
+that work reports latency or throughput. Energy has been measured for KV offloading (at low concurrency, across
+buffer sizes of 8--128\,GiB, on production agent traces)~\cite{mao2026offloading} and for prefix reuse on single
+requests~\cite{shewale2026prefixbench}, but not through the collapse that many concurrent agents cause, and not for
+the admission rules proposed to prevent it.
+
+We report measurements, a small model that predicts them, and an admission gate built from the model. We ran
+everything on one NVIDIA H200 NVL with two unmodified engines (vLLM and SGLang) and three models of different shapes (a
+dense 32B model, a 30B mixture-of-experts (MoE) model and a dense 8B model); only the 10-minute adaptive-gate runs used a second H200 NVL host. The workloads go from controlled to real:
+synthetic sessions whose size and pauses we set, 400 recorded SWE-agent trajectories, a replay of 1/8 and 1/4 samples of two 15-minute windows of
+Kimi's one-hour production tool-agent trace, with their original timing and prefix sharing, and 400 graded tasks from the
+Berkeley Function Calling Leaderboard (BFCL) multi-turn benchmark. We wrote each prediction down before the run that
+tested it (Appendix~\ref{app:prereg}) and kept the ones that failed.
+
+Figure~\ref{fig:arch} shows the paths a prompt token can take and where the gate sits.
+
+\input{fig_arch}
+
+\paragraph{Findings.}
+\begin{enumerate}
+\item \textbf{Past the cliff, a full cache saves almost no energy.} GPU energy per turn equals that of running with no cache,
+to within 0.01--1.6\% in every cell past the cliff we measured (vLLM: three models and two context lengths; SGLang: Qwen3-32B). The cliff falls where the agents'
+working set $W$ exceeds the cache capacity $C$ by a factor of 1.2--2.2: hits fall to half their 16-session level at 1.2 and vanish by 1.55 with 5\,s pauses, and fall to
+half at 1.5 and vanish by 2.2 with 30\,s pauses. With sessions 2.5 times longer (27k instead of 11k tokens) the cliff moved from between 16 and 32 sessions to between 8 and 16, consistent with the $1/s$ scaling of Eq.~\eqref{eq:cliff} (Section~\ref{sec:cliff}).
+\item \textbf{Holding KV costs no measurable power; rebuilding it does.} A full cache changed idle power by less than
+0.2\%, and restoring a prompt's KV from host memory took 1/110 to 1/220 of the above-idle GPU energy of recomputing it,
+with the gap growing with context length (Section~\ref{sec:cost}).
+\item \textbf{On production traffic, a host tier adds capacity.} In a replay of Kimi's tool-agent trace, a 160\,GB host
+tier let one H200 finish every request where the GPU cache alone finished 85--86\%, and process 16--18\% more prompt tokens
+for about the same GPU energy (15--17\% less per prompt token), in two time windows of a 1/4 sample that overloads the
+card; on a 1/8 sample, which the GPU cache served in full, the tier saved under 1\% (Sections~\ref{sec:tiers}
+and~\ref{sec:production}).
+\item \textbf{The energy is predictable on a busy GPU.} A one-parameter model fitted on synthetic sessions predicts the
+production energy ratios to within about 1\% when the GPU is saturated, and a block-level hit-rate predictor run on
+hashed request logs matches the measured hit rate to within 0.04--4.3 percentage points when the GPU keeps up. The model fails at
+light load and the predictor under overload; we report both (Sections~\ref{sec:model} and~\ref{sec:production}).
+\item \textbf{A gate that acts only under pressure costs nothing below the cliff and saves energy above it.} Admitting every agent while the working set is at most 1.2 times the cache, and
+$K$ agents from Eq.~\eqref{eq:gate} above that, cost no energy below the cliff, with 90th-percentile resume latency no worse. Above it, in 150\,s
+steps, it cut energy per turn by 41--45\% but left a third to a half of the sessions unserved at the highest loads; in
+600\,s steps it served every session, completed 48--62\% more turns and cut energy per turn by 42--50\%, at the price of
+queueing: the 90th percentile of first-turn latency was 1.9--2.7 times the GPU cache's (Section~\ref{sec:control}).
+\item \textbf{On graded tasks, the cache doubled correct answers per kWh.} On BFCL, accuracy with and without the cache differed by 3 of 400 tasks (204 correct with the cache,
+201 without; one round) and halved time and energy: 2.0$\times$ the correct answers per kWh (Section~\ref{sec:accuracy}).
+\end{enumerate}
+
+\paragraph{What is not new.} Thrashing, the cliff, the weakness of eviction policies, host-tier sizing by working set
+and working-set admission control are all published~\cite{chen2026concur,he2026robot,lu2026metastability,
+shao2026efficientagent,denning1968working}, and so are offloading during tool calls~\cite{xia2026mori,tokencake2025}
+and hit-rate prediction from traces~\cite{kvset2026}. Our contribution is to measure these in GPU energy, on one
+hardware platform and one set of workloads, including production traffic; to show how far a simple model predicts them; and to report where
+the published ideas fail in practice (Section~\ref{sec:control}). All energy figures are GPU board energy read from
+the energy counter of NVML (the NVIDIA Management Library). We could not meter host CPU and memory energy in our rented container, and we do not convert
+our percentages to whole-server savings (Section~\ref{sec:discussion}, Limitations).
+
+\input{fig_workflow}

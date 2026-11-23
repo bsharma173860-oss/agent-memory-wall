@@ -1,0 +1,69 @@
+[
+ {
+  "name": "sglang-host120",
+  "engine": "sglang",
+  "policy": "offload",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "120"
+  ]
+ },
+ {
+  "name": "sglang-host240",
+  "engine": "sglang",
+  "policy": "offload",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "240"
+  ]
+ },
+ {
+  "name": "sglang-host80-wb",
+  "engine": "sglang",
+  "policy": "offload-write-back",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "80",
+   "--hicache-write-policy",
+   "write_back"
+  ]
+ },
+ {
+  "name": "sglang-host160-wb",
+  "engine": "sglang",
+  "policy": "offload-write-back",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "160",
+   "--hicache-write-policy",
+   "write_back"
+  ]
+ },
+ {
+  "name": "sglang-host160-formula",
+  "engine": "sglang",
+  "policy": "offload+formula",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "160"
+  ],
+  "admit": {
+   "mode": "formula",
+   "turns": 8,
+   "safety": 0.9,
+   "growth": 600,
+   "interval": 2,
+   "capacity": 610351
+  }
+ }
+]

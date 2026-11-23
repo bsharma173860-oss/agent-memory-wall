@@ -1,0 +1,2 @@
+(EngineCore pid=10436) INFO 11-06 00:58:13 [model_runner.py:428] Model loading took 61.03 GiB memory and 11.812837 seconds
+(EngineCore pid=10436) INFO 11-06 00:58:52 [kv_cache_utils.py:1147] GPU KV cache size: 244,928 tokens, Maximum concurrency for 32,768 tokens per request: 7.47x

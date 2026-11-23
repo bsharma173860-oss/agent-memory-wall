@@ -1,0 +1,55 @@
+\section{Related work}
+\label{sec:related}
+
+\paragraph{KV caching and memory tiers.} PagedAttention~\cite{kwon2023pagedattention} manages KV memory in pages and
+lets vLLM share blocks across requests; SGLang's RadixAttention~\cite{zheng2024sglang} keeps finished requests' KV in a
+radix tree under LRU\@. Pensieve~\cite{yu2025pensieve} and CachedAttention~\cite{gao2024cachedattention} keep
+multi-turn state across a GPU and a host tier, and Mooncake~\cite{qin2024mooncake}, LMCache~\cite{liu2025lmcache} and
+SGLang's HiCache~\cite{xie2025hicache} provide host or disaggregated tiers in production engines. Meng
+et~al.~\cite{meng2025bottlenecks} show that offloaded serving can be bound by PCIe. These systems report latency,
+throughput or cost. Lu et~al.\ already treat a write-through HiCache tier as inclusive, with capacity
+$\max(C, C_{\text{host}})$~\cite{lu2026metastability}.
+
+\paragraph{Agents, thrashing and tiers.} InferCept~\cite{abhyankar2024infercept} chooses among discarding, preserving
+and swapping context during tool calls; Continuum~\cite{li2025continuum} pins KV with a time-to-live; CacheWise~\cite{tiwari2026cachewise}
+uses reuse-aware eviction for coding agents; MARS~\cite{wang2026mars} keeps KV only when a warm resume shortens the
+critical path. TokenCake~\cite{tokencake2025} moves idle KV to host memory when a function call starts, if the freed memory can be used, and
+MORI~\cite{xia2026mori} ranks agent programs by idleness and places the most idle in host memory, reporting 20--71\%
+higher throughput on Claude Code traces. CONCUR~\cite{chen2026concur} names middle-phase thrashing and controls it with
+an AIMD window; He~\cite{he2026robot} reports a sharp retention boundary under cyclic revisits (between 28 and 32 sessions of 100k tokens in a 3.35M-token pool,
+just below $C/s$) and avoids the thrashing with a static cap; Lu et~al.~\cite{lu2026metastability} fit the cliff at $1.9\,C/\bar c$, with $\bar c$ the mean context, in a disaggregated engine and admit
+sessions against a working-set budget (Basin); concurrently, Valse and Jannesari~\cite{valse2026trap} show that a burst can
+trap an engine in a state where every turn misses, model that state with a renewal law and rescue it with a session
+cap, reporting hits and throughput rather than energy; Shao et~al.~\cite{shao2026efficientagent} show that a host tier pays
+off only when it holds the reuse working set, sized with a stack-distance model. TAO~\cite{li2026tao} jointly selects
+and places waiting sessions. Our admission gate is a working-set rule in the same
+family; we add the energy measurements and the shared-prefix correction (Basin already switches its admission on only
+above a working-set threshold), and we report where each version failed.
+
+\paragraph{Traces and hit-rate prediction.} Wang et~al.\ characterize two weeks of Alibaba's KV reuse and find ideal
+hit rates of 54--62\%~\cite{wang2025kvcachewild}. Agentic coding traces from GitHub Copilot~\cite{copilot2026wild} and
+TraceLab~\cite{tracelab2026} show long contexts and long idle gaps, and Khailo~\cite{keepalive2026} prices
+keeping prefixes warm across pauses. KVSET~\cite{kvset2026} estimates hit rate against capacity from traces with the
+Mattson stack algorithm~\cite{mattson1970evaluation} and validates it with a production coding-agent trace against cache pools of several sizes;
+Yao et~al.~\cite{yao2026lrumeanfield} derive a closed-form limit of the LRU hit ratio for multi-turn conversations and an
+estimator for memory provisioning. Our block-LRU
+predictor is the same idea; what we add is its check against a GPU in both regimes (it holds when the card keeps up and
+reads high under overload) and the energy model on top of it.
+
+\paragraph{Energy of serving.} Serving energy is benchmarked routinely~\cite{chung2025mlenergy,pronk2025benchmarking,
+zine2026attention,luo2026request}, and the carbon cost of caching and of agents has been modelled and optimized~\cite{greencache2025,agentdecarbonizer2026}.
+PrefixBench-H100~\cite{shewale2026prefixbench} reports 24--31\% less energy per request from prefix reuse (20--24\% in its own table) at
+concurrency 1; Librarian~\cite{cho2026librarian} fits 34\,mJ per uncached and 2\,mJ per cached input token for a 27B model
+in FP8 on a B200; the SIMPLE law~\cite{cavagna2026simple} estimates that prefix caching removes 93\% of agentic prefill
+energy. Luo et~al.~\cite{luo2026where} show that, on their agent server, GPU-only telemetry missed 41--45\% of the energy. Closest
+to us, Mao and Zhou~\cite{mao2026offloading} measure vLLM's KV offloading on an H200 at concurrency 2--6 and find 14--32\%
+savings only above about 90\% KV utilization, with a host-side cost bounded below 1\% of the GPU saving; they estimate restore
+to be at least 400$\times$ cheaper per byte than recompute. The llm-d agenda~\cite{sisodia2026toward} asks when
+transfer is greener than recompute. We answer it for one case, restoring from host memory over PCIe, by measurement, through the collapse and on production
+traffic.
+
+\paragraph{Classic results.} Our explanations are textbook ones: Belady's optimal replacement~\cite{belady1966study},
+Denning's working set and thrashing~\cite{denning1968working,denning1968thrashing}, LRU's failure on cyclic patterns
+and its fixes~\cite{jiang2002lirs,megiddo2003arc}, and Wong and Wilkes on inclusive versus exclusive two-level
+caches~\cite{wong2002mycache}, whose analysis predicts our write-back result. Prior serving work already draws these parallels;
+we claim no novelty for them.

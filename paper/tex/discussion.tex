@@ -1,0 +1,41 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\paragraph{Longer contexts lower the cliff.} Equation~\eqref{eq:cliff} with $\kappa$ between 1.2 and 2.2 gives a rough count
+of the agents a card can hold before its cache stops paying. For a 32B model in BF16 and sessions of 68k tokens, the
+median reported for GitHub Copilot's agent traces~\cite{copilot2026wild}, it gives about 4--8 sessions on an H200, 7--13 on a
+192\,GB card and 13--24 on a 288\,GB card. These are projections, not measurements: our measurements support the
+model at about 11k and 27k tokens on one card. If agent contexts keep growing faster than HBM capacity, the number of agents a card can hold will fall, and host tiers and
+admission control will matter more.
+
+\paragraph{Energy, capacity and money.} For an operator who rents GPUs, the energy saved is worth little in itself:
+at its 600\,W maximum board power~\cite{nvidia2024h200} an H200 NVL draws about 440\,kWh a month, about \$44 at an assumed \$0.10 per kWh, while the card we rented
+cost \$3.71 an hour, about \$2,700 a month. What the results buy is capacity. Finishing every production request
+instead of 85--86\%, or serving 22--33\% more recorded agent turns, amounts to needing fewer GPUs. Where power, not
+GPUs, limits a deployment, lower energy per turn means more turns from the same power.
+
+\paragraph{Limitations.}
+\label{sec:limits}
+All results come from one GPU type (H200 NVL) in one rented container (the 10-minute adaptive-gate runs in a second container), with one model family. Energy is GPU board
+energy only: host CPU and memory were not metered, and system-level savings can be proportionally smaller, since on one agent server GPU telemetry
+missed 41--45\% of the energy~\cite{luo2026where}. The pauses of the recorded trajectories are synthetic, because the dataset has
+no tool timings; the production trace has real timing but synthetic token contents, which preserve sharing and length
+but not, for example, any effect of content on decoding. One GPU cannot carry the production trace, so we replayed
+1/8 and 1/4 samples by prefix group. The admission results use
+synthetic sessions or recorded trajectories, not a live agent framework, and the adaptive gate needs to know how many
+sessions are open; its switch was tested only with 5\,s pauses. The miss-penalty sweep, BFCL, most production cells, the long-context no-cache baseline, the 10-minute adaptive-gate runs and SGLang's GPU cache
+with Qwen3-8B ran one round. In the production replay, energy per prompt token counts all energy but only finished
+requests' tokens, which favors policies that finish more requests; the 15--17\% host-tier gain includes this effect,
+which we did not separate. One block of runs was
+discarded after two copies of a run script shared the GPU; no result in this paper comes from it.
+
+\section{Conclusion}
+
+Below the cliff the GPU cache saved 38--64\% of GPU energy per turn on synthetic sessions with 5\,s pauses; past it, energy per turn was within
+0.01--1.6\% of running without a cache, because a thrashing cache does the same work as no cache. The cliff follows from capacity and session size, with a measured factor of 1.2--2.2 that was larger with 30\,s than with 5\,s pauses, and
+moves inward as contexts grow. A 1/4 sample of production tool-agent traffic pushed one GPU past its capacity, and a 160\,GB host tier
+let it finish every request: 16--18\% more prompt tokens for about the same GPU board energy. Restoring KV took
+1/110 to 1/220 of the above-idle GPU energy of recomputing it, holding it cost no measurable power, and a gate that
+acts only under pressure cost no energy below the cliff and, in two 10-minute runs above it, served every session with
+42--50\% less energy per turn and 48--62\% more turns, at the price of minutes of queueing at admission. On a busy GPU that keeps up, the energy effect of a host tier
+can be estimated from hashed request logs before a server is changed: within 4--6\% for the two tiers we tested on production traffic.

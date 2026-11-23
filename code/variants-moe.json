@@ -1,0 +1,2 @@
+[{"name": "vllm-gpu-moe", "engine": "vllm", "policy": "gpu-only", "python": "/workspace/venv-vllm/bin/python", "flags": []},
+ {"name": "vllm-nocache-moe", "engine": "vllm", "policy": "recompute", "python": "/workspace/venv-vllm/bin/python", "flags": ["--disable-prefix-caching"]}]

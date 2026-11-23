@@ -1,0 +1,3 @@
+#!/bin/sh
+# The kit's test only: a machine with no GPU, whose "GPU" is always free.
+echo 0

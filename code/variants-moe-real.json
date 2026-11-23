@@ -1,0 +1,34 @@
+[
+ {
+  "name": "vllm-gpu-moe-real",
+  "engine": "vllm",
+  "policy": "gpu-only",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": []
+ },
+ {
+  "name": "vllm-nocache-moe-real",
+  "engine": "vllm",
+  "policy": "recompute",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [
+   "--disable-prefix-caching"
+  ]
+ },
+ {
+  "name": "vllm-formula-moe-real",
+  "engine": "vllm",
+  "policy": "formula",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [],
+  "admit": {
+   "mode": "formula",
+   "turns": 8,
+   "safety": 0.9,
+   "growth": 300,
+   "interval": 2,
+   "stat": "mean",
+   "shared": 1500
+  }
+ }
+]

@@ -1,0 +1,5 @@
+[
+ {"name": "vllm-gpu-lc-10m", "engine": "vllm", "policy": "gpu-only", "python": "/workspace/venv-vllm/bin/python", "flags": []},
+ {"name": "vllm-adaptive-lc-10m", "engine": "vllm", "policy": "brain-v0-adaptive", "python": "/workspace/venv-vllm/bin/python", "flags": [],
+  "admit": {"mode": "adaptive", "turns": 4, "safety": 0.9, "growth": 600, "interval": 2, "stat": "mean", "theta": 1.2}}
+]

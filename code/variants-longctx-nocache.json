@@ -1,0 +1,11 @@
+[
+ {
+  "engine": "vllm",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [
+   "--disable-prefix-caching"
+  ],
+  "name": "vllm-nocache-lc",
+  "policy": "recompute"
+ }
+]

@@ -1,0 +1,11 @@
+[
+  {"name": "vllm-gpu-real", "engine": "vllm", "policy": "gpu-only", "python": "/workspace/venv-vllm/bin/python", "flags": []},
+  {"name": "vllm-nocache-real", "engine": "vllm", "policy": "recompute", "python": "/workspace/venv-vllm/bin/python", "flags": ["--disable-prefix-caching"]},
+  {"name": "vllm-gate16x8-real", "engine": "vllm", "policy": "admission", "python": "/workspace/venv-vllm/bin/python", "flags": [], "admit": {"slots": 16, "turns": 8}},
+  {"name": "vllm-formula-real", "engine": "vllm", "policy": "formula", "python": "/workspace/venv-vllm/bin/python", "flags": [],
+   "admit": {"mode": "formula", "turns": 8, "safety": 0.9, "growth": 600, "interval": 2}},
+  {"name": "vllm-aimd-real", "engine": "vllm", "policy": "aimd", "python": "/workspace/venv-vllm/bin/python", "flags": [],
+   "admit": {"mode": "aimd", "turns": 8, "start": 8, "alpha": 2, "beta": 0.5, "h": 0.2, "u_low": 0.2, "u_high": 0.5, "interval": 2}},
+  {"name": "sglang-gpu-real", "engine": "sglang", "policy": "gpu-only", "python": "/workspace/venv-sglang/bin/python", "flags": []},
+  {"name": "sglang-host160-real", "engine": "sglang", "policy": "offload", "python": "/workspace/venv-sglang/bin/python", "flags": ["--enable-hierarchical-cache", "--hicache-size", "160"]}
+]

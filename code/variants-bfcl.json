@@ -1,0 +1,4 @@
+[
+  {"name": "vllm-gpu-bfcl", "engine": "vllm", "python": "/workspace/venv-vllm/bin/python", "flags": []},
+  {"name": "vllm-nocache-bfcl", "engine": "vllm", "python": "/workspace/venv-vllm/bin/python", "flags": ["--disable-prefix-caching"]}
+]

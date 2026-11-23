@@ -1,0 +1,16 @@
+[
+ {
+  "name": "vllm-formula-8b",
+  "engine": "vllm",
+  "policy": "formula",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [],
+  "admit": {
+   "mode": "formula",
+   "turns": 4,
+   "safety": 0.9,
+   "growth": 600,
+   "interval": 2
+  }
+ }
+]

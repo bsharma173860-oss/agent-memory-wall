@@ -1,0 +1,23 @@
+[
+ {
+  "name": "sglang-host80wb-formula",
+  "engine": "sglang",
+  "policy": "offload-wb+formula",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "80",
+   "--hicache-write-policy",
+   "write_back"
+  ],
+  "admit": {
+   "mode": "formula",
+   "turns": 4,
+   "safety": 0.9,
+   "growth": 600,
+   "interval": 2,
+   "capacity": 420000
+  }
+ }
+]

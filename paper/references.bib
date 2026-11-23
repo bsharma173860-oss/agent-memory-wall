@@ -1,0 +1,575 @@
+% references.bib -- KV-cache energy study
+% Built 2026-11-06. Verification status is given above each entry:
+%   [arXiv-verified]   title, authors, date checked on https://arxiv.org/abs/<id> and the export.arxiv.org API on 2026-11-06.
+%   [site-verified]    title, authors checked on the venue's own site (hotcarbon.org) and in the PDF.
+%   [secondary]        venue, pages or DOI not checked at the publisher (ACM DL, USENIX, NeurIPS, DOI resolver all
+%                      blocked from this machine). Confirmed from reference lists of verified 2026 arXiv papers,
+%                      which are named in the comment.
+%   [UNVERIFIED]       not checked online at all. Taken from the standard bibliographic record. Check before submission.
+% Key scheme: <first-author-surname><year><short-name>.
+
+% ---------------------------------------------------------------------------
+% (a) KV caching and memory tiers in LLM serving
+% ---------------------------------------------------------------------------
+
+% [arXiv-verified 2309.06180; arXiv comment says SOSP 2023] [secondary: pages and DOI from HotCarbon'26 ref [7] and 2611.02543 ref [41]]
+@inproceedings{kwon2023pagedattention,
+  author    = {Kwon, Woosuk and Li, Zhuohan and Zhuang, Siyuan and Sheng, Ying and Zheng, Lianmin and Yu, Cody Hao and Gonzalez, Joseph E. and Zhang, Hao and Stoica, Ion},
+  title     = {Efficient Memory Management for Large Language Model Serving with {PagedAttention}},
+  booktitle = {Proceedings of the 29th Symposium on Operating Systems Principles (SOSP '23)},
+  pages     = {611--626},
+  year      = {2023},
+  doi       = {10.1145/3600006.3613165},
+  eprint    = {2309.06180},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2309.06180}
+}
+
+% [arXiv-verified 2312.07104] [secondary: NeurIPS 2024 (Advances in NeurIPS 37) from 2611.02543 ref [93] and 2609.33762 refs]
+@inproceedings{zheng2024sglang,
+  author    = {Zheng, Lianmin and Yin, Liangsheng and Xie, Zhiqiang and Sun, Chuyue and Huang, Jeff and Yu, Cody Hao and Cao, Shiyi and Kozyrakis, Christos and Stoica, Ion and Gonzalez, Joseph E. and Barrett, Clark and Sheng, Ying},
+  title     = {{SGLang}: Efficient Execution of Structured Language Model Programs},
+  booktitle = {Advances in Neural Information Processing Systems 37 (NeurIPS 2024)},
+  year      = {2024},
+  eprint    = {2312.07104},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2312.07104}
+}
+
+% [arXiv-verified 2312.05516] [secondary: EuroSys 2025, pages, DOI from 2611.02543 ref [91] and 2609.33762 refs]
+@inproceedings{yu2025pensieve,
+  author    = {Yu, Lingfan and Lin, Jinkun and Li, Jinyang},
+  title     = {Stateful Large Language Model Serving with {Pensieve}},
+  booktitle = {Proceedings of the Twentieth European Conference on Computer Systems (EuroSys '25)},
+  pages     = {144--158},
+  year      = {2025},
+  doi       = {10.1145/3689031.3696086},
+  eprint    = {2312.05516},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2312.05516}
+}
+
+% [arXiv-verified 2403.19708; arXiv comment says USENIX ATC 2024] [secondary: pages from 2611.02543 ref [23].
+%  HotCarbon'26 ref [3] gives different pages (1117-1132) and misspelled author names; we use arXiv names.]
+@inproceedings{gao2024cachedattention,
+  author    = {Gao, Bin and He, Zhuomin and Sharma, Puru and Kang, Qingxuan and Jevdjic, Djordje and Deng, Junbo and Yang, Xingkun and Yu, Zhou and Zuo, Pengfei},
+  title     = {Cost-Efficient Large Language Model Serving for Multi-turn Conversations with {CachedAttention}},
+  booktitle = {2024 USENIX Annual Technical Conference (USENIX ATC '24)},
+  pages     = {111--126},
+  year      = {2024},
+  eprint    = {2403.19708},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2403.19708}
+}
+
+% [arXiv-verified 2407.00079, v5 title and authors] Published at FAST '25 under a different title
+% ("Mooncake: Trading More Storage for Less Computation -- A KVCache-centric Architecture for Serving LLM Chatbot",
+%  pp. 155-170, with two more authors) per 2611.02543 ref [67]; that version is NOT verified here, so we cite the arXiv one.
+@inproceedings{qin2025mooncakefast,
+  author    = {Qin, Ruoyu and Li, Zheming and He, Weiran and Cui, Jialei and Ren, Feng and Zhang, Mingxing and Wu, Yongwei and Zheng, Weimin and Xu, Xinran},
+  title     = {{Mooncake}: Trading More Storage for Less Computation --- A {KVCache}-centric Architecture for Serving {LLM} Chatbot},
+  booktitle = {23rd USENIX Conference on File and Storage Technologies (FAST '25)},
+  pages     = {155--170},
+  year      = {2025},
+  url       = {https://www.usenix.org/conference/fast25/presentation/qin}
+}
+
+@misc{qin2024mooncake,
+  author    = {Qin, Ruoyu and Li, Zheming and He, Weiran and Zhang, Mingxing and Wu, Yongwei and Zheng, Weimin and Xu, Xinran},
+  title     = {{Mooncake}: A {KVCache}-centric Disaggregated Architecture for {LLM} Serving},
+  year      = {2024},
+  eprint    = {2407.00079},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2407.00079}
+}
+
+% [arXiv-verified 2510.09665]
+@misc{liu2025lmcache,
+  author    = {Liu, Yuhan and Cheng, Yihua and Yao, Jiayi and An, Yuwei and Chen, Xiaokun and Feng, Shaoting and Huang, Yuyang and Shen, Samuel and Zhang, Rui and Du, Kuntai and Jiang, Junchen},
+  title     = {{LMCache}: An Efficient {KV} Cache Layer for Enterprise-Scale {LLM} Inference},
+  year      = {2025},
+  eprint    = {2510.09665},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2510.09665}
+}
+
+% [secondary ONLY: blog post cited as 2611.02543 ref [84]; lmsys.org is blocked from this machine, so the page itself is NOT checked]
+@misc{xie2025hicache,
+  author       = {Xie, Zhiqiang},
+  title        = {{SGLang HiCache}: Fast Hierarchical {KV} Caching with Your Favorite Storage Backends},
+  howpublished = {\mbox{LMSYS} Org blog},
+  year         = {2025},
+  url          = {https://www.lmsys.org/blog/2025-09-10-sglang-hicache/}
+}
+
+% [arXiv-verified 2601.19910; submitted 2025-12-16]
+@misc{meng2025bottlenecks,
+  author    = {Meng, William and Lee, Benjamin and Wang, Hong},
+  title     = {Understanding Bottlenecks for Efficiently Serving {LLM} Inference With {KV} Offloading},
+  year      = {2025},
+  eprint    = {2601.19910},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.AR},
+  url       = {https://arxiv.org/abs/2601.19910}
+}
+
+% ---------------------------------------------------------------------------
+% (b) Agent / multi-turn KV reuse and thrashing
+% ---------------------------------------------------------------------------
+
+% [arXiv-verified 2402.01869] [secondary: ICML 2024, PMLR 235, pp. 81-95 from 2611.02543 ref [1]]
+@inproceedings{abhyankar2024infercept,
+  author    = {Abhyankar, Reyna and He, Zijian and Srivatsa, Vikranth and Zhang, Hao and Zhang, Yiying},
+  title     = {{InferCept}: Efficient Intercept Support for Augmented Large Language Model Inference},
+  booktitle = {Proceedings of the 41st International Conference on Machine Learning (ICML)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {235},
+  pages     = {81--95},
+  year      = {2024},
+  eprint    = {2402.01869},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2402.01869}
+}
+
+% [arXiv-verified 2511.02230, v7]
+@misc{li2025continuum,
+  author    = {Li, Hanchen and He, Runyuan and Mang, Qiuyang and Zhang, Qizheng and Mao, Huanzhi and Chen, Xiaokun and Zhou, Hangrui and Zhang, Huanchen and Cheung, Alvin and Gonzalez, Joseph and Stoica, Ion},
+  title     = {{Continuum}: Efficient and Robust Multi-Turn {LLM} Agent Scheduling with {KV} Cache Time-to-Live},
+  year      = {2025},
+  eprint    = {2511.02230},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2511.02230}
+}
+
+% [arXiv-verified 2606.16824]
+@misc{tiwari2026cachewise,
+  author    = {Tiwari, Shubham and Chugh, Tapan and Rickert, Nash and Peter, Simon and Mahajan, Ratul and Shen, Haiying},
+  title     = {{CacheWise}: Understanding Workloads and Optimizing {KVCache} Management for Efficiently Serving {LLM} Coding Agents},
+  year      = {2026},
+  eprint    = {2606.16824},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2606.16824}
+}
+
+% [arXiv-verified 2601.22705]
+@misc{chen2026concur,
+  author    = {Chen, Qiaoling and Ye, Zhisheng and Tang, Tian and Sun, Peng and Tian, Boyu and Wang, Guoteng and Li, Shenggui and Wen, Yonggang and Han, Zhenhua and Zhang, Tianwei},
+  title     = {{CONCUR}: High-Throughput Agentic Batch Inference of {LLM} via Congestion-Based Concurrency Control},
+  year      = {2026},
+  eprint    = {2601.22705},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2601.22705}
+}
+
+% [arXiv-verified 2611.01404]
+@misc{he2026robot,
+  author    = {He, Sida},
+  title     = {Serving Agentic Robot Fleets: Workload Characterization, {KV}-Cache Thrashing, and Admission Control},
+  year      = {2026},
+  eprint    = {2611.01404},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.RO},
+  url       = {https://arxiv.org/abs/2611.01404}
+}
+
+% [arXiv-verified 2611.02543]
+@misc{liu2026fancyevict,
+  author    = {Liu, Yiyu and Yu, Minlan and Yang, Juncheng},
+  title     = {When Fancy Eviction Fails: Rethinking Cache Replacement For {LLM} Prefix Reuse},
+  year      = {2026},
+  eprint    = {2609.28870},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2609.28870}
+}
+
+@misc{yao2026lrumeanfield,
+  author    = {Yao, Heyuan and Gao, Chutong and Lyu, Yuan and Grosof, Izzy and Simchi-Levi, David},
+  title     = {Multi-Turn {LLM} Conversations under the Least-Recently-Used Policy: Mean-Field Asymptotics and Hit Ratio Approximation},
+  year      = {2026},
+  eprint    = {2609.02027},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.PF},
+  url       = {https://arxiv.org/abs/2609.02027}
+}
+
+@misc{valse2026trap,
+  author    = {Valse, Akshat and Jannesari, Ali},
+  title     = {Inside the Trap: A Renewal Law for Prefix-Cache Collapse in {LLM} Agent Serving},
+  year      = {2026},
+  eprint    = {2611.08902},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2611.08902}
+}
+
+@misc{lu2026metastability,
+  author    = {Lu, Chengzhi and Zhou, Boxi and Lin, Yanying and Ustiugov, Dmitrii},
+  title     = {When Cache Pressure Becomes a Trap: Metastability in Agent Serving},
+  year      = {2026},
+  eprint    = {2611.02543},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2611.02543}
+}
+
+% [arXiv-verified 2609.33762] NOT in the plan's literature section; closest prior work to our host-tier sizing result.
+@misc{shao2026efficientagent,
+  author    = {Shao, Kunming and Chen, Jierun and Yu, Jiangnan and Li, Xiao-Hui and Tao, Chaofan and Wang, Yanli and Lin, Huanxin and Cheng, Kwang-Ting and Tsui, Chi Ying and Bai, Haoli},
+  title     = {{EfficientAgent}: What Makes {KV} Cache Offloading Work for Concurrent Agents?},
+  year      = {2026},
+  eprint    = {2609.33762},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2609.33762}
+}
+
+% [arXiv-verified 2609.19657]
+@misc{shewale2026prefixbench,
+  author    = {Shewale, Omkar and Kumar, Deepak and Yadav, Divakar Kumar},
+  title     = {{PrefixBench-H100}: Characterizing Prefix Reuse and Time-to-First-Token in {H100} {LLM} Serving},
+  year      = {2026},
+  eprint    = {2609.19657},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.PF},
+  url       = {https://arxiv.org/abs/2609.19657}
+}
+
+% ---------------------------------------------------------------------------
+% (c) Admission and scheduling for agents
+% ---------------------------------------------------------------------------
+
+% [arXiv-verified 2604.26963, v2]
+@misc{wang2026mars,
+  author    = {Wang, Yifei and Ye, Hancheng and Xu, Yechen and Guo, Cong and Wei, Chiyue and Wang, Qinsi and Li, Dongting and Chen, Tingjun and Li, Hai Helen and Zhuo, Danyang and Chen, Yiran},
+  title     = {{MARS}: Efficient, Adaptive Co-Scheduling for Heterogeneous Agentic Systems},
+  year      = {2026},
+  eprint    = {2604.26963},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.OS},
+  url       = {https://arxiv.org/abs/2604.26963}
+}
+
+% [arXiv-verified 2610.37230]
+@misc{li2026tao,
+  author    = {Li, Shuhuai and Ye, Shengdong and Ge, Dongdong and Ye, Yinyu and Lin, Jianghao},
+  title     = {{TAO}: Tool-Aware Joint Scheduling for {LLM}-Based Agentic Serving},
+  year      = {2026},
+  eprint    = {2610.37230},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2610.37230}
+}
+
+% ---------------------------------------------------------------------------
+% (d) Energy measurement of LLM serving and of offloading
+% ---------------------------------------------------------------------------
+
+% [arXiv-verified 2505.06371; arXiv comment says NeurIPS Datasets and Benchmarks 2025 (Spotlight)]
+@inproceedings{chung2025mlenergy,
+  author    = {Chung, Jae-Won and Ma, Jeff J. and Wu, Ruofan and Liu, Jiachen and Kweon, Oh Jun and Xia, Yuxuan and Wu, Zhiyu and Chowdhury, Mosharaf},
+  title     = {The {ML.ENERGY} Benchmark: Toward Automated Inference Energy Measurement and Optimization},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS 2025), Datasets and Benchmarks Track},
+  year      = {2025},
+  eprint    = {2505.06371},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2505.06371}
+}
+
+% [arXiv-verified 2509.08867]
+@misc{pronk2025benchmarking,
+  author    = {Pronk, K. and Zhao, Q.},
+  title     = {Benchmarking Energy Efficiency of Large Language Models Using {vLLM}},
+  year      = {2025},
+  eprint    = {2509.08867},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.SE},
+  url       = {https://arxiv.org/abs/2509.08867}
+}
+
+% [arXiv-verified 2607.09172, v2]
+@misc{zine2026attention,
+  author    = {Zine, Nada and Coignion, Tristan and Stoico, Vincenzo and Quinton, Cl{\'e}ment and Malavolta, Ivano and Rouvoy, Romain and Lago, Patricia},
+  title     = {Attention to Detail: Evaluating Energy, Performance, and Accuracy Trade-offs Across {vLLM} Configurations},
+  year      = {2026},
+  eprint    = {2607.09172},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.SE},
+  url       = {https://arxiv.org/abs/2607.09172}
+}
+
+% [arXiv-verified 2608.00026]
+@misc{luo2026request,
+  author    = {Luo, Qi and Li, Kunlin and Wang, Ziwen and Wang, Dongsheng and Chen, Yun},
+  title     = {Request-Level Energy Attribution for Batched {LLM} Serving},
+  year      = {2026},
+  eprint    = {2608.00026},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.AI},
+  url       = {https://arxiv.org/abs/2608.00026}
+}
+
+% [arXiv-verified 2609.29707]
+@misc{luo2026where,
+  author    = {Luo, Qi and Li, Kunlin and Wang, Ziwen and Chen, Yun},
+  title     = {Where Does the Energy Go? {Profiling} {LLM} Agent Inference on {Blackwell} {GPUs}},
+  year      = {2026},
+  eprint    = {2609.29707},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2609.29707}
+}
+
+% [arXiv-verified 2605.27787, v2; arXiv comment says EMNLP 2026 Main Conference. Proceedings pages not yet available.]
+@inproceedings{cho2026librarian,
+  author    = {Cho, Seunghyuk and Choi, Sunghyun and Heo, Jaeseung and Choi, Youngbin and Moon, Saemi and Park, MoonJeong and Kim, Dongwoo},
+  title     = {Long Live the Librarian! {A} Persistent Search Sub-Agent for Energy-Efficient Multi-Agent Software Engineering Systems},
+  booktitle = {Proceedings of the 2026 Conference on Empirical Methods in Natural Language Processing (EMNLP 2026)},
+  year      = {2026},
+  eprint    = {2605.27787},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2605.27787}
+}
+
+% [arXiv-verified 2611.03330]
+@misc{cavagna2026simple,
+  author    = {Cavagna, Hiari Pizzini and Proia, Andrea and Cesarini, Daniele and Kiziltan, Zeynep and Bartolini, Andrea},
+  title     = {The {SIMPLE} Law for Energy Cost of {LLM} Inference},
+  year      = {2026},
+  eprint    = {2611.03330},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.AI},
+  url       = {https://arxiv.org/abs/2611.03330}
+}
+
+% [site-verified: https://hotcarbon.org/2026 program, Session 1 "LLM Serving", and the PDF.
+%  Workshop held July 16-17, 2026 at the University of Washington. The PDF footer reads
+%  "ACM SIGENERGY Energy Informatics Review, Volume X Issue Y, July 2026" (template placeholder), so no volume/pages yet.]
+@inproceedings{mao2026offloading,
+  author    = {Mao, Gilbert L. and Zhou, Ruiyang},
+  title     = {Energy Characterization of {KV} Cache Offloading Under Agentic Workloads},
+  booktitle = {Workshop on Sustainable Computer Systems (HotCarbon '26)},
+  year      = {2026},
+  url       = {https://hotcarbon.org/assets/2026/paper-20.pdf}
+}
+
+% [arXiv-verified 2609.05565] Single-author position/synthesis paper; reports no new measurements (its own arXiv comment).
+@misc{sisodia2026toward,
+  author    = {Sisodia, Twinkll},
+  title     = {Toward Sustainable Distributed {LLM} Inference: A Systems Synthesis and Research Agenda for an Energy-, Carbon-, and Cache-Aware {llm-d} Control Plane},
+  year      = {2026},
+  eprint    = {2609.05565},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.DC},
+  url       = {https://arxiv.org/abs/2609.05565}
+}
+
+% ---------------------------------------------------------------------------
+% (e) Classic memory-management results
+% ---------------------------------------------------------------------------
+
+% [secondary: venue, pages, DOI from reference lists of 2601.22705, 2611.01404, 2611.02543 and 2609.33762]
+@article{denning1968working,
+  author    = {Denning, Peter J.},
+  title     = {The Working Set Model for Program Behavior},
+  journal   = {Communications of the ACM},
+  volume    = {11},
+  number    = {5},
+  pages     = {323--333},
+  year      = {1968},
+  doi       = {10.1145/363095.363141}
+}
+
+% [secondary: venue, pages, DOI from 2611.02543 ref [17]]
+@inproceedings{denning1968thrashing,
+  author    = {Denning, Peter J.},
+  title     = {Thrashing: Its Causes and Prevention},
+  booktitle = {Proceedings of the AFIPS Fall Joint Computer Conference, Part I (AFIPS '68 Fall)},
+  pages     = {915--922},
+  year      = {1968},
+  doi       = {10.1145/1476589.1476705}
+}
+
+% [secondary: venue, pages, DOI from 2606.16824 reference list]
+@article{belady1966study,
+  author    = {Belady, L. A.},
+  title     = {A Study of Replacement Algorithms for a Virtual-Storage Computer},
+  journal   = {IBM Systems Journal},
+  volume    = {5},
+  number    = {2},
+  pages     = {78--101},
+  year      = {1966},
+  doi       = {10.1147/sj.52.0078}
+}
+
+% [secondary: venue, pages, DOI from 2609.33762 reference list] Added: EfficientAgent's model rests on it.
+@article{mattson1970evaluation,
+  author    = {Mattson, R. L. and Gecsei, J. and Slutz, D. R. and Traiger, I. L.},
+  title     = {Evaluation Techniques for Storage Hierarchies},
+  journal   = {IBM Systems Journal},
+  volume    = {9},
+  number    = {2},
+  pages     = {78--117},
+  year      = {1970},
+  doi       = {10.1147/sj.92.0078}
+}
+
+% [UNVERIFIED: no reachable source. Standard record. Check pages and DOI before submission.]
+@inproceedings{jiang2002lirs,
+  author    = {Jiang, Song and Zhang, Xiaodong},
+  title     = {{LIRS}: An Efficient Low Inter-reference Recency Set Replacement Policy to Improve Buffer Cache Performance},
+  booktitle = {Proceedings of the 2002 ACM SIGMETRICS International Conference on Measurement and Modeling of Computer Systems},
+  pages     = {31--42},
+  year      = {2002},
+  doi       = {10.1145/511334.511340}
+}
+
+% [UNVERIFIED: no reachable source. Standard record. Check pages before submission.]
+@inproceedings{megiddo2003arc,
+  author    = {Megiddo, Nimrod and Modha, Dharmendra S.},
+  title     = {{ARC}: A Self-Tuning, Low Overhead Replacement Cache},
+  booktitle = {Proceedings of the 2nd USENIX Conference on File and Storage Technologies (FAST '03)},
+  pages     = {115--130},
+  year      = {2003}
+}
+
+% [UNVERIFIED: no reachable source. Standard record. Check pages before submission.]
+@inproceedings{wong2002mycache,
+  author    = {Wong, Theodore M. and Wilkes, John},
+  title     = {My Cache or Yours? {Making} Storage More Exclusive},
+  booktitle = {Proceedings of the 2002 USENIX Annual Technical Conference},
+  pages     = {161--175},
+  year      = {2002}
+}
+
+% [arXiv-verified 2609.27746 via export.arxiv.org API, 2026-11-08; the tool is named KVSET in the abstract]
+@misc{kvset2026,
+  title  = {The {KV} Cache Working Set: Online Capacity Planning for {LLM} Inference Systems},
+  author = {Li, Luchang and Wang, Shuaishuai and Ruan, Zhao and Li, Dongfang and Gong, Bozhao},
+  year   = {2026},
+  eprint = {2609.27746},
+  url    = {https://arxiv.org/abs/2609.27746},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.DC}
+}
+
+% [arXiv-verified 2606.00866 via export.arxiv.org API, 2026-11-08]
+@misc{xia2026mori,
+  title  = {Idleness is Relative: Exploiting Tool-Call Idle Windows for Offloading in Agentic Systems with {MORI}},
+  author = {Xia, Tian and Li, Hanchen and Li, Zhifei and Chen, Xiaokun and Kang, Hao and Qiao, Yifan and Xu, Yi and Stoica, Ion},
+  year   = {2026},
+  eprint = {2606.00866},
+  url    = {https://arxiv.org/abs/2606.00866},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.OS}
+}
+
+% [arXiv-verified 2510.18586 via export.arxiv.org API, 2026-11-08]
+@misc{tokencake2025,
+  title  = {{TokenCake}: A {KV}-Cache-centric Serving Framework for {LLM}-based Multi-Agent Applications},
+  author = {Bian, Zhuohang and Wu, Feiyang and Li, Zhuoran and Ma, Teng and Zhuo, Youwei},
+  year   = {2025},
+  eprint = {2510.18586},
+  url    = {https://arxiv.org/abs/2510.18586},
+  archivePrefix = {arXiv},
+}
+
+% [arXiv-verified 2607.19214 via export.arxiv.org API, 2026-11-08]
+@misc{keepalive2026,
+  title  = {Keeping the Cache Warm Pays: Keepalive Economics for Agentic Workloads},
+  author = {Khailo, Maxim},
+  year   = {2026},
+  eprint = {2607.19214},
+  url    = {https://arxiv.org/abs/2607.19214},
+  archivePrefix = {arXiv},
+}
+
+% [arXiv-verified 2606.30560 via export.arxiv.org API, 2026-11-08]
+@misc{tracelab2026,
+  title  = {{TraceLab}: Characterizing Coding Agent Workloads for {LLM} Serving},
+  author = {Zhu, Kan and Jacob, Mathew and Ma, Chenxi and Pan, Yi and Wang, Stephanie and Krishnamurthy, Arvind and Kasikci, Baris},
+  year   = {2026},
+  eprint = {2606.30560},
+  url    = {https://arxiv.org/abs/2606.30560},
+  archivePrefix = {arXiv},
+}
+
+% [arXiv-verified 2608.00101 via export.arxiv.org API, 2026-11-08]
+@misc{copilot2026wild,
+  title  = {Agentic Coding in the Wild: Characterizing {GitHub Copilot} Traces at Production Scale},
+  author = {Liu, Banruo and Qiu, Haoran and Goiri, {\'I}{\~n}igo and Fonseca, Rodrigo and Bianchini, Ricardo and Choukse, Esha},
+  year   = {2026},
+  eprint = {2608.00101},
+  url    = {https://arxiv.org/abs/2608.00101},
+  archivePrefix = {arXiv},
+}
+
+% [arXiv-verified 2506.02634 via export.arxiv.org API, 2026-11-08]
+@inproceedings{wang2025kvcachewild,
+  title     = {{KVCache} Cache in the Wild: Characterizing and Optimizing {KVCache} Cache at a Large Cloud Provider},
+  author    = {Wang, Jiahao and Han, Jinbo and Wei, Xingda and Shen, Sijie and Zhang, Dingyan and Fang, Chenguang and Chen, Rong and Yu, Wenyuan and Chen, Haibo},
+  booktitle = {2025 USENIX Annual Technical Conference (USENIX ATC '25)},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2506.02634}
+}
+
+% [arXiv-verified 2505.23970 via export.arxiv.org API, 2026-11-08]
+@misc{greencache2025,
+  title  = {Cache Your Prompt When It's Green: Carbon-Aware Caching for Large Language Model Serving},
+  author = {Tian, Yuyang and Sun, Desen and Ding, Yi and Liu, Sihang},
+  year   = {2025},
+  eprint = {2505.23970},
+  url    = {https://arxiv.org/abs/2505.23970},
+  archivePrefix = {arXiv},
+}
+
+% [arXiv-verified 2608.20566 via export.arxiv.org API, 2026-11-08]
+@misc{agentdecarbonizer2026,
+  title  = {{AgentDecarbonizer}: Carbon-Aware Execution for {AI} Agents},
+  author = {Yan, Leyi and Li, Shuangning and Liu, Sihang},
+  year   = {2026},
+  eprint = {2608.20566},
+  url    = {https://arxiv.org/abs/2608.20566},
+  archivePrefix = {arXiv},
+}
+
+@inproceedings{bfcl2025,
+  title     = {The {Berkeley Function Calling Leaderboard} ({BFCL}): From Tool Use to Agentic Evaluation of Large Language Models},
+  author    = {Patil, Shishir G. and Mao, Huanzhi and Yan, Fanjia and Ji, Charlie Cheng-Jie and Suresh, Vishnu and Stoica, Ion and Gonzalez, Joseph E.},
+  booktitle = {Proceedings of the 42nd International Conference on Machine Learning (ICML 2025)},
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {267},
+  pages     = {48371--48392},
+  year      = {2025},
+  url    = {https://gorilla.cs.berkeley.edu/leaderboard.html}
+}
+
+@misc{nebius2024swetraj,
+  title  = {{SWE-agent} trajectories},
+  author = {{Nebius}},
+  year   = {2024},
+  howpublished = {Hugging Face dataset \texttt{nebius/SWE-agent-trajectories}},
+  url    = {https://huggingface.co/datasets/nebius/SWE-agent-trajectories}
+}
+
+% [arXiv-verified 2505.09388 via export.arxiv.org API, 2026-11-08]
+@misc{qwen3,
+  title  = {Qwen3 Technical Report},
+  author = {{Qwen Team}},
+  year   = {2025},
+  eprint = {2505.09388},
+  archivePrefix = {arXiv},
+  url    = {https://arxiv.org/abs/2505.09388}
+}
+
+% [Vendor specification: H200 NVL dense BF16 = 1,671 TFLOPS with sparsity / 2 = ~836 TFLOPS. Check the current datasheet URL before submission.]
+@misc{nvidia2024h200,
+  author       = {{NVIDIA}},
+  title        = {{NVIDIA H200} Tensor Core {GPU}},
+  howpublished = {Product specifications},
+  year         = {2024},
+  url          = {https://www.nvidia.com/en-us/data-center/h200/}
+}

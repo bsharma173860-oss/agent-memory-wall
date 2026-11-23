@@ -1,0 +1,96 @@
+\section{A first-order model}
+\label{sec:model}
+
+The measurements in later sections follow from six short arguments. We state them here so that each result can be
+read against a prediction.
+
+\paragraph{Recomputing a prompt.} Prefill is compute-bound, so its energy per token is the work per token times the
+energy per operation. For Qwen3-32B the linear layers cost two FLOP per non-embedding parameter (31.2 billion), 62.4\,GFLOP per token, independent of
+context, and attention costs $2\times2\times64\times128\times64 \approx 2.10$\,MFLOP per earlier token (scores and values, 64 heads of 128, 64 layers). A causal prefill of
+$L$ tokens sees $L/2$ earlier tokens on average, so
+\begin{equation}
+  \begin{aligned}
+  F(L) &= 62.4\,\text{GFLOP} + 2.10\,\text{MFLOP}\times L/2,\\
+  e_r(L) &= \varepsilon\,F(L),
+  \end{aligned}
+  \label{eq:recompute}
+\end{equation}
+where $\varepsilon$ is the energy per operation above idle. We fit $\varepsilon$ on the recompute runs of Section~\ref{sec:cost} with prompts
+near 10k tokens: 7,850 prompt tokens/s at 588\,W, or 0.57\,PFLOP/s, about 68\% of the H200 NVL's 836\,TFLOP/s dense
+BF16 peak~\cite{nvidia2024h200}, so the energy is about 1.03\,pJ per FLOP gross, and $\varepsilon\approx0.87$\,pJ above an idle draw of
+92\,W. With the above-idle value, Eq.~\eqref{eq:recompute} gives 59, 63 and 73\,mJ per token for the measured mean prompt lengths of 4,962, 10,066
+and 20,336 tokens; Section~\ref{sec:cost} measures 56--58, 62--64 and 73\,mJ. The 10k agreement is the fit; the other
+two are predictions. Recomputation becomes dearer per token as context grows.
+
+\paragraph{Restoring a prompt.} One token's KV for Qwen3-32B is $b_{\text{KV}}=2\times64\times8\times128\times2 = 262{,}144$\,bytes.
+Assuming a PCIe Gen5 link of bandwidth $B\approx50$\,GB/s, copying $b_{\text{KV}}$ bytes takes 5.2\,\textmu s, so at an
+assumed GPU board draw of $P=100$--250\,W during the copy (an upper bound on the above-idle cost)
+\begin{equation}
+  e_h = P\,b_{\text{KV}}/B \approx 0.5\text{--}1.3\,\text{mJ per token},
+  \label{eq:restore}
+\end{equation}
+about 45--140 times below $e_r$ (Section~\ref{sec:cost} measures 110--220). In this model the ratio $e_r/e_h$ grows with $L$ only through $e_r$.
+
+\paragraph{Why thrashing costs what no cache costs.} Let $C$ be the GPU's KV capacity in tokens, $N$ the
+number of sessions and $s$ the tokens each holds, so that the working set is $W=Ns$. Under LRU a session's KV
+survives a pause only if everything touched since its last turn fits in $C$. When sessions return in near-cyclic order
+and $W > C$, every session is evicted just before it returns: the classic loop pathology of
+LRU~\cite{jiang2002lirs}. With zero hits the tokens left to prefill, $U$, are identical to those of a
+server without a cache, so the energy of a turn is the same in both:
+\begin{equation}
+  E_{\text{turn}} = e_r\,U + E_{\text{decode}} + P_{\text{idle}}\,t,
+  \label{eq:turn}
+\end{equation}
+where $E_{\text{decode}}$ is the energy of generating the answer, $P_{\text{idle}}$ the idle power and $t$ the turn's duration. A full cache then saves nothing.
+
+\paragraph{Where the cliff is.} If returns were strictly cyclic, the cliff would sit at $W/C=1$, that is,
+at $N^\ast=C/s$. In a mean-field random-order model, in which a session is away for one mean cycle while the others return as
+Poisson processes, each other session is touched during the absence with probability $1-1/e$, which would move the
+cliff to $W/C\approx1.58$ (Appendix~\ref{app:derive}). Measured cliffs fit neither model, so we write
+\begin{equation}
+  N^\ast \approx \kappa\,\frac{C}{s},\qquad C = \frac{M_{\text{HBM}}\,u - M_{\text{weights}}}{b_{\text{KV}}},
+  \label{eq:cliff}
+\end{equation}
+with $M_{\text{HBM}}$ the nominal GPU memory (activation and runtime memory, a few GB, are ignored), $M_{\text{weights}}$ the weight bytes, $u$ the fraction of memory the engine
+claims, $b_{\text{KV}}$ the KV bytes per token, and $\kappa$ measured
+(Section~\ref{sec:cliff}): with 5\,s pauses hits fall to half their 16-session level at $W/C\approx1.2$ and vanish by 1.55; with 30\,s pauses they fall to half that level at
+1.5 and persist past the random-order 1.58 until 2.2. We write $\kappa=1.2$--2.2 for this band. We did not measure
+the order of returns; a likely reading is that queueing keeps them nearly cyclic at short pauses. The
+numbers of He~\cite{he2026robot} imply a factor near 1 for strict cycles, and Lu et~al.~\cite{lu2026metastability} report 1.9.
+An inclusive host tier, such as SGLang's write-through HiCache, replaces $C$ with $\max(C, C_{\text{host}})$ rather than
+the sum~\cite{lu2026metastability}, where $C_{\text{host}}$ is the tier's capacity in tokens.
+
+\paragraph{One parameter for energy.} Restoring costs almost nothing (Eq.~\eqref{eq:restore}), so on a busy GPU the
+energy per turn falls linearly with the hit rate $h$:
+\begin{equation}
+  E \approx E_{\text{thrash}}\,(1 - f\,h),
+  \label{eq:energy}
+\end{equation}
+where $E_{\text{thrash}}$ is the energy per turn (on a saturated card, equivalently per prompt token) of the same load with zero hits, from a thrashing GPU cache or no cache, which Eq.~\eqref{eq:turn} makes equal, $h$ the hit rate
+above that cache's (near-zero) hit rate, and $f$ the share of a thrashing turn's energy spent on prefill. Fitting $f$
+on a single cell (160\,GB host tier, 48 synthetic sessions: $h=0.754$, 449.7\,J against 1,058\,J) gives $f=0.76$. With no further fitting,
+Eq.~\eqref{eq:energy} predicts the other overloaded (48- and 96-session) synthetic Qwen3-32B host-tier cells to within 1.4\% (2.5--3.4\% at
+16 sessions) except one ($-13\%$, Section~\ref{sec:tiers}),
+and the busy (1/4-sample) production replays to within about 1\% (Section~\ref{sec:production}); it underpredicts the Qwen3-8B 160\,GB
+cells by 4--5\%. It assumes a saturated card: at light
+load, idle and decode-bound time dilute the prefill share, and the model overstates the saving
+(Section~\ref{sec:production}).
+
+\paragraph{Admission.} If at most $K$ sessions may hold the GPU at once and their KV fits in $C$, each admitted session pays one
+cold turn, of energy $E_{\text{cold}}$, and then warm ones, of energy $E_{\text{warm}}$, so with $q$ turns per admission
+\begin{equation}
+  \begin{aligned}
+  E(q) &= \frac{E_{\text{cold}} + (q-1)\,E_{\text{warm}}}{q},\\
+  K &= \left\lfloor 0.9\,\frac{C - S}{\bar s - S + g}\right\rfloor,
+  \end{aligned}
+  \label{eq:gate}
+\end{equation}
+where $S$ is the prefix shared by all sessions (one system prompt, stored once), $\bar s$ the session-size estimate (the mean of recent prompts; the 11k-token
+synthetic runs and the Qwen3-8B runs, where $S=0$, used the 90th percentile instead) and
+$g$ one turn's growth; the factor 0.9 keeps 10\% of the free memory as headroom. The cold-turn excess
+$(E_{\text{cold}}-E_{\text{warm}})/q$ falls as $1/q$, while, by Little's law, a session waits about
+$(N/K-1)\,q\,T_{\text{turn}}$ for a slot when all $N$ are always queued, with $T_{\text{turn}}$ the time from one turn's request to the next, including the tool pause, so fewer slots trade waiting for energy. The gate is Denning's working-set rule~\cite{denning1968working},
+the same idea as the static cap of He~\cite{he2026robot} and the budget of Lu et~al.~\cite{lu2026metastability}; we add the
+shared-prefix correction, after the version without it over-restricted real agents (Section~\ref{sec:control}). Like
+the activation rule of Basin, the admission policy of Lu et~al.~\cite{lu2026metastability}, the gate has an on/off condition: admit everyone while the working set, with the shared prefix counted once, $S + N(\bar s - S)$, is at most $\theta C$, with $\theta=1.2$ the measured cliff factor (measured with $W$ from each session's largest prompt; the switch's estimate from $\bar s$ is smaller, so it engages at a somewhat higher load),
+and apply $K$ only above it.

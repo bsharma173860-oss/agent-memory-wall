@@ -1,0 +1,76 @@
+\section{Setup and method}
+\label{sec:setup}
+
+\paragraph{Terms.} A \emph{policy} is one cache configuration under test. A session's size $s$ is the number of tokens of
+KV it holds; the \emph{working set} $W$ is the KV the open sessions need at once, and the \emph{cliff} is the load at
+which the cache's hit rate collapses. \emph{GPU cache} (``GPU'' in some tables) is the engine's default prefix cache in GPU memory with no
+host tier; \emph{no cache} turns prefix caching off; a \emph{host tier} keeps evicted or copied KV in host memory. LRU,
+LFU and SLRU are least-recently-used, least-frequently-used and segmented-LRU eviction. TTFT is the time to the first
+output token; \emph{resume latency} is the TTFT of a session's later turns plus any wait for admission; p90 is the 90th
+percentile. A \emph{step} is one measured period at a fixed configuration; in the production replay
+the \emph{drain} is the 240\,s after a window ends during which running requests may finish. AIMD is
+additive-increase, multiplicative-decrease window control. Figure~\ref{fig:workflow} summarizes the method.
+
+\paragraph{Hardware and engines.} Except where noted, all runs used one NVIDIA H200 NVL (141\,GB of high-bandwidth memory, HBM; PCIe Gen5 $\times$16 to the host) rented
+as a container that could use up to 454\,GiB of host memory. The 10-minute adaptive-gate runs (Section~\ref{sec:control}) used a second H200 NVL host with the same
+engine and meter versions (driver 595, idle 97\,W). We ran vLLM 0.33 and SGLang 0.5.23 without modification, with prefix
+caching on (vLLM's automatic prefix caching; SGLang's radix cache) unless a run turned it off. vLLM used 90\% of GPU
+memory and SGLang 88\%. Host-memory tiers were vLLM's KV offloading and SGLang's hierarchical cache (HiCache) in its
+default write-through (WT) mode, and in write-back (WB) mode where stated.
+
+\paragraph{Models.} Qwen3-32B (dense, 64 layers, 64 query and 8 KV heads of dimension 128; 256\,KiB of KV per token in BF16),
+Qwen3-30B-A3B (mixture of experts, 48 layers, 4 KV heads; 96\,KiB per token) and Qwen3-8B (dense; 144\,KiB per
+token)~\cite{qwen3}, all in BF16\@. After weights, the engines' GPU KV capacity $C$ was 244,928 tokens for Qwen3-32B on
+vLLM (251,423 on SGLang), 704,032 for Qwen3-30B-A3B on vLLM, and 777,872 for Qwen3-8B on vLLM (780,230 on SGLang), as
+reported in each engine's startup log.
+
+\paragraph{Energy.} We read the GPU's cumulative energy counter through NVML every 0.1\,s with \texttt{joules}, our open-source
+meter, and attributed to each step the energy between its start and end. Before each engine's measured steps we sent
+four warm-up requests, waited until GPU temperature varied by less than 1\,\textdegree C over 60\,s, and measured 30\,s of
+idle power. Every energy figure in this paper is GPU board energy. The container hid the CPU's RAPL (Running Average Power Limit) counters and refused
+\texttt{perf\_event\_open}, so host CPU and memory energy were not metered; we logged the engines' CPU time instead. Under load the card ran near
+its 600\,W limit, so differences in energy per turn mostly reflect throughput at nearly constant power; we did not vary
+clocks or the power cap.
+
+\paragraph{Workloads.} We used four, from controlled to real.
+\begin{itemize}
+\item \emph{Synthetic sessions.} Each session starts from its own document (a first prompt of about 10.6k tokens, about
+26k for the long-context runs) and repeats: append a tool output and a question, request a 200-token answer
+(with end-of-sequence ignored, so every policy generates the same number of tokens), append a fixed summary (the prompt grows by about 600 tokens per turn), then pause for a
+log-normal time with median 5\,s or 30\,s ($\sigma=0.8$, capped at six times the median). The appended text is fixed,
+not the model's answer, so every policy sees the same prompts. Sessions stop sending new requests 150\,s into a step (600\,s in the 10-minute static-gate, formula, tier-with-gate and
+adaptive-gate runs); energy and turns cover the step until requests in flight finish, which past the cliff lasts longer
+with the GPU cache than with a gate. Sessions start staggered.
+\item \emph{Recorded agent trajectories.} 400 SWE-agent trajectories from a public dataset~\cite{nebius2024swetraj}. Each
+assistant turn becomes one request carrying the exact recorded history (system prompt, tool outputs and earlier
+answers) and asking for an answer of about the recorded length (its characters divided by 3.5, 16 to 1,024 tokens); a
+history that would exceed about 28k tokens starts a new task. The recorded answer, not the model's, is appended, so every
+policy sees identical prompts. Pauses are synthetic (median 5\,s) because the dataset does not record tool times.
+\item \emph{Production traffic.} The tool-agent trace (\texttt{toolagent\_trace.jsonl}) that Moonshot AI released with the FAST'25 version of Mooncake~\cite{qin2025mooncakefast}:
+one hour of production requests to Kimi (23,608 requests; prompt length median 6,346 and 90th percentile 16,810
+tokens), each with its arrival time, prompt and output lengths, and a hash for every 512-token block of its prompt.
+The text is withheld, so we rebuilt each block as 512 fixed token ids derived from its hash; two requests then share
+exactly the prefix tokens the production requests shared, and a cache sees the same reuse. One GPU cannot carry a
+cluster's traffic, so we sampled prefix groups (whole conversations) at 1/8 or 1/4 and sent their requests open-loop
+at the recorded times, with the recorded output lengths (requests longer than the model's 40,960-token context,
+29 of 1,392 in the first window at 1/4, were skipped), over two 15-minute windows of the hour (minutes 0--15 and
+30--45). Requests still running 240\,s after a window ended were counted as unfinished. In the second window
+the 1/4 sample ran right after the 1/8 sample, which it contains, on the same engine, so it began with a warm cache.
+\item \emph{Graded agent tasks.} 400 of BFCL v4's multi-turn tasks~\cite{bfcl2025} (the 200 base and 200 long-context ones),
+run with the benchmark's own harness and grader against the engine, 100 tasks at a time.
+\end{itemize}
+
+\paragraph{Protocol.} Every hypothesis was written into a plan document under version control before the runs that
+tested it, most with a numeric threshold; verdicts were added in later commits, and no prediction was edited after its first run;
+Appendix~\ref{app:prereg} lists each prediction with the time of the commit that added it. Some baselines come from earlier phases on the same host (for example the Qwen3-8B GPU cache in Table~\ref{tab:adaptive}). Most
+configurations ran twice, in alternating order across rounds (except the long-context runs, whose two rounds used the
+same order), and headline cells three times; the miss-penalty sweep, BFCL,
+the production cells other than three in the first window, the long-context no-cache baseline and SGLang's GPU cache
+with Qwen3-8B ran once, as did the 10-minute adaptive-gate runs of Section~\ref{sec:control}. The same
+sessions (seeds) were used in every round, so differences between rounds measure run-to-run noise; two further seeds
+(vLLM, GPU cache and no cache at 16 and 48 sessions) checked that the cliff results do not depend on one draw of sessions. One block of runs was voided after two copies
+of a run script shared the GPU, and all of its results were discarded. Six later starts failed (four for lack of GPU memory
+behind the previous engine, one script bug, one failed flag check); four were re-run, and the other two left SGLang's GPU cache with Qwen3-8B and the long-context no-cache baseline
+with one round. The first host rented for the 10-minute runs could not start vLLM 0.33 (its driver was too
+old) and produced no measurements. We report every failed prediction. Scripts, results and every version of the plan are public at
+\url{https://github.com/bsharma173860-oss/agent-memory-wall}.

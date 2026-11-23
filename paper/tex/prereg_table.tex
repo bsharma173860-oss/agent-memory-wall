@@ -1,0 +1,41 @@
+\begin{table}[p]
+\centering\footnotesize
+\renewcommand{\arraystretch}{1.0}
+\caption{Pre-registered hypotheses (abridged), commit time (UTC, 2026) and outcome. Rows follow the plan's numbering;
+where two times are given, a clause was added or reworded, or a cell dropped, in a later commit, before the runs that tested it.}
+\label{tab:prereg}
+\begin{tabular}{p{0.03\textwidth}>{\raggedright\arraybackslash}p{0.125\textwidth}>{\raggedright\arraybackslash}p{0.36\textwidth}>{\raggedright\arraybackslash}p{0.41\textwidth}}
+\toprule
+& Written & Prediction & Outcome \\
+\midrule
+H1 & 5 Nov 15:36 & vLLM and SGLang within 3\% in energy per output token, default and tuned & Partly: defaults within 2.3\%; tuned settings differ by up to 5.7\% on a retrieval-style workload (one SGLang scheduling flag), in an open-loop chat and retrieval comparison run before the agent study and not otherwise reported \\
+H2 & 5 Nov 15:36 & Miss/hit energy penalty $\le$1.5$\times$ at 1 user, $\ge$5$\times$ at 64 users & Supported: 1.46--1.48$\times$ and 10.1--10.6$\times$, both engines \\
+H3 & 5 Nov 15:36, 23:29 & An 80\,GB host tier cuts energy per turn $\ge$20\% at 48 sessions & Not supported: $-10$ to $-9\%$ (inclusive tier smaller than the working set) \\
+H4 & 5 Nov 15:36 & Longer pauses make offload more useful & Not supported as stated (no threshold): unchanged, smaller or larger by engine and size \\
+H5 & 5 Nov 15:36 & Host-side cost of offloading $<$10\% of the GPU saving & Partly (an estimate): 0.5--3\% where SGLang tiers saved most; 11--128\% for SGLang tiers and 4.7--212\% for vLLM 70\,GiB where savings were small \\
+H6 & 6 Nov 02:07 & A gate of 16 slots: hit $\ge$30\%, energy $\ge$25\% lower at 48 sessions, both pause lengths & Partly: supported at 5\,s ($-41$ to $-47\%$); not at 30\,s ($+6$ to $+8\%$ at 48) \\
+H7 & 6 Nov 02:14 & LFU keeps $\ge$20\% hit at 48 sessions; SLRU collapses ($<$5\%) & Partly: LFU not supported (0.21\%); SLRU supported; both within 0.2\% of LRU in energy; 20--28\% worse on real trajectories \\
+H8 & 6 Nov 02:48 & Fit hit rate against $W/C$ to the fixed-cycle ($\kappa=1$) and random-order ($\kappa\approx1.58$) models (no threshold) & No threshold: neither fits both; resumed-turn hits halve (from their 16-session level) at $W/C\approx1.2$ (5\,s) and 1.5 (30\,s), vanish by 1.55 and 2.2 \\
+H9 & 6 Nov 02:56 & A 160\,GB tier: hit $\ge$50\%, energy $\ge$20\% lower at 48 sessions; $<$10\% saving at 96 & Partly: $-57\%$ at 48; $-16\%$ at 96 (threshold missed) \\
+H10 & 6 Nov 03:23 & Restore $\le$1/10 of recompute per token & Supported: 1/110 to 1/220 \\
+H11 & 6 Nov 09:30 & Holding a full cache costs $<$2\% idle power & Supported: $-0.08$ to $-0.16\%$ \\
+H12 & 6 Nov 12:59 & BFCL: accuracy within 2 points; $\ge$20\% less energy per correct task & Supported (one round): 204 vs.\ 201, $-51\%$ \\
+H13 & 6 Nov 05:09 & Formula saves $\ge$30\% and beats AIMD & Partly: $-40\%$, $-31\%$ at 48, 96 sessions (5\,s pauses), $-7\%$, $-1\%$ (30\,s); below AIMD in 3 of 4 cells; AIMD 0.55\% lower in the fourth \\
+H14 & 6 Nov 05:34, 18:02 & Real trajectories collapse at 96 (later: 192--288) sessions; formula (at 96) and 160\,GB tier (at 48) each $\ge$20\% (later: both at 192--288) & Partly: no collapse (68\% hit at 96, 72--73\% at 192--288); formula $-12$ to $-13\%$ at 96, $+31\%$ at 192--288; 160\,GB tier $-3\%$ at 48 (missed), $-27\%$, $-31\%$ at 192, 288 \\
+H15 & 6 Nov 06:20 & No time-based eviction & Supported: resends after 25\,min fully cached \\
+H16 & 6 Nov 09:30 & MoE: same cliff; formula $\ge$20\% on real agents & Partly: cliff and thrash = no cache held; formula clause not (no collapse) \\
+H17 & 6 Nov 13:35, 23:58 & 120\,GB: 10--40\% hit; 240\,GB: $\ge$75\% hit at 48, 15--50\% hit and $\ge$35\% saving at 96; 160\,GB tier with the formula $\ge$60\% hit & Partly: 120\,GB 50\% and 240\,GB at 96 $-29\%$ missed; 240\,GB hits 75.5\%, 37.2\% and tier with formula 75\% held (49 of 96 sessions served) \\
+H18 & 6 Nov 13:40 & Write-back beats write-through at 80\,GB (at 50\% hit, about half the RAM for the same benefit); within 10\% at 160\,GB & Partly: 11.4--12.6\% $\to$ 36.5\%, $-27\%$ energy; 50\% mark not reached; 160\,GB equal \\
+H19 & 7 Nov 01:29 & 160\,GB + gate, 10-min steps: all served, $\ge$30\% below 160\,GB alone & Supported: 96/96 served, $-36\%$, $+34.5\%$ turns \\
+H20 & 7 Nov 01:29 & 80\,GB write-back + gate within 15\% of 160\,GB + gate & Not supported: $+20$ to $+21\%$ (gate capacity set to 420k tokens) \\
+H21 & 7 Nov 01:29 & 160\,GB + gate $\ge$25\% below 160\,GB alone on real agents; 80\,GB WB between GPU cache and 160\,GB & Partly: $+10\%$ and 0\% (gate sized to the GPU, not the tier; Section~\ref{sec:control}); write-back clause supported \\
+H22 & 7 Nov 01:29 & Qwen3-8B: cliff near $C/s$ (hit $>$60\% at 64, $<$5\% at 256); tier and formula each $\ge$30\% & Partly: cliff thresholds and formula ($-41\%$) supported; tier not ($-20\%$, $+2\%$) \\
+H23 & 7 Nov 04:27 & Production hit within 5 points of block-LRU prediction & Partly: 2 of 3 cells (window 1); 0.04--0.6 points at 1/8 (window 2); overload misses \\
+H24 & 7 Nov 04:27 & No cache cannot keep up; GPU cache finishes $\ge$98\% & Partly: no cache 61--62\%; GPU cache only 85--86\% \\
+H25 & 7 Nov 04:27 & GPU cache $\le$0.70$\times$ no-cache energy per token; tiers follow Eq.~\eqref{eq:energy} within 5\% & Partly: 0.717--0.718 (missed); tiers within 1\% \\
+H26 & 7 Nov 18:51 & Long context: hit $\ge$85\% at 4, $\ge$70\% at 8, $<$5\% at 32 with energy within 3\% of no cache & Supported \\
+H27 & 7 Nov 18:51 & Adaptive gate: no cost below the cliff, formula's gain above & Supported: every cell, both workloads, both rounds (resumed turns) \\
+H28 & 8 Nov 18:55, 19:15 & Adaptive gate, 600\,s steps: $\ge$75\% served, $\ge$30\% less energy, first-turn p90 $\le$1.5$\times$ GPU cache & Partly: 100\% served, $-42\%$ and $-50\%$; first-turn p90 2.7$\times$ and 1.9$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,49 @@
+[
+ {
+  "engine": "vllm",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [],
+  "name": "vllm-gpu-lc",
+  "policy": "gpu-only"
+ },
+ {
+  "engine": "vllm",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [
+   "--disable-prefix-caching"
+  ],
+  "name": "vllm-nocache-lc",
+  "policy": "recompute"
+ },
+ {
+  "engine": "vllm",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [],
+  "name": "vllm-formula-lc",
+  "policy": "formula",
+  "admit": {
+   "mode": "formula",
+   "turns": 4,
+   "safety": 0.9,
+   "growth": 600,
+   "interval": 2,
+   "stat": "mean"
+  }
+ },
+ {
+  "engine": "vllm",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [],
+  "name": "vllm-adaptive-lc",
+  "policy": "brain-v0-adaptive",
+  "admit": {
+   "mode": "adaptive",
+   "turns": 4,
+   "safety": 0.9,
+   "growth": 600,
+   "interval": 2,
+   "stat": "mean",
+   "theta": 1.2
+  }
+ }
+]

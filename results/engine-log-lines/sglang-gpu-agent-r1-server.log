@@ -1,0 +1,1 @@
+[2026-11-06 01:52:43] max_total_num_tokens=251423, chunked_prefill_size=8192, max_prefill_tokens=16384, max_running_requests=3928, context_len=32768, available_gpu_mem=13.44 GB

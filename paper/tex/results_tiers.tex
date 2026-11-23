@@ -1,0 +1,65 @@
+\section{Host-memory tiers}
+\label{sec:tiers}
+
+A host tier moves the cliff by enlarging the effective capacity, and Eq.~\eqref{eq:restore} says it should cost little
+to use. Whether it helps depends on whether it holds the working set, as Shao et~al.\ showed for
+run time~\cite{shao2026efficientagent}; we measure how much energy it saves as a function of its size
+(Table~\ref{tab:tiers}).
+
+\begin{table}[t]
+\centering\small
+\caption{SGLang host tiers, Qwen3-32B, synthetic sessions, 5\,s pauses (two rounds). WT: write-through; WB: write-back. $N$: sessions; Hit: hit rate. GPU cache alone:
+0.12\% hit and 1,058\,J per turn at 48 sessions, 0.09\% and 1,035\,J at 96. vs.\ GPU: change in J/turn against the GPU cache alone at the same load. Where the two rounds differ at the precision shown, both values are given.}
+\label{tab:tiers}
+\begin{tabular}{lrrrr}
+\toprule
+Tier & $N$ & Hit & J/turn & vs.\ GPU \\
+\midrule
+80\,GB WT & 48 & 11.4--12.6\% & 953--962 & $-10$ to $-9\%$ \\
+80\,GB WB & 48 & 36.5\% & 768 & $-27\%$ \\
+120\,GB WT & 48 & 49.9--50.3\% & 652--655 & $-38\%$ \\
+160\,GB WT & 48 & 75.5\% & 450 & $-57\%$ \\
+240\,GB WT & 48 & 75.5\% & 448--449 & $-58\%$ \\
+160\,GB WT & 96 & 20.2\% & 873 & $-16\%$ \\
+240\,GB WT & 96 & 37.2\% & 732 & $-29\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Size against the working set.}\enlargethispage{\baselineskip} At 48 sessions the working set is about 548k tokens. SGLang's write-through
+tier mirrors the GPU, so its usable capacity is roughly the host size rather than the sum of host and
+GPU~\cite{lu2026metastability}: 80\,GB holds about 305k tokens ($W/C_{\text{host}}\approx1.8$, past the cliff) and saved 9--10\%; 160\,GB
+holds about 610k ($W/C_{\text{host}}\approx0.9$) and saved 57\% with 84\% more turns and a median time to first token of 9\,s
+instead of 55\,s. A 240\,GB tier added nothing at 48 sessions, because the set already fit, and saved 29\% at 96
+sessions, where it did not. vLLM's host tier, which we could size only to 70\,GiB in our container, changed energy by $+0.3\%$ to $-6\%$.
+
+\paragraph{A less inclusive tier gets more from the same memory.} In write-back mode SGLang copies KV to the host only
+when it is evicted from the GPU, so the two tiers overlap less. At 80\,GB, write-back raised the hit rate from 11.4--12.6\%
+to 36.5\% and cut energy per turn by 27\% instead of 9--10\%; at 160\,GB it matched write-through (not shown). On recorded
+trajectories at 192 and 288 sessions an 80\,GB write-back tier came within 1.3--4.5\% of 160\,GB write-through
+(68.8 against 67.9\,J and 62.1 against 59.4\,J per turn) with turn counts within 4.5\%: a less inclusive tier with half the host memory gave nearly the same
+result.
+
+\paragraph{Real trajectories.} On recorded SWE-agent sessions the 160\,GB tier lowered energy per turn by 33\% with
+33\% more turns at 96 sessions against SGLang's GPU cache alone (91.5 against 136.6--138.2\,J), and by 27\% and 31\%
+with 22\% and 27\% more turns at 192 and 288 sessions against vLLM's GPU cache (we did not run SGLang without a
+tier at these loads). At 48 sessions, with no memory pressure yet, it
+saved 3\%. These gains are smaller than on synthetic sessions because the GPU cache alone did not
+collapse (Section~\ref{sec:cliff}).
+
+\paragraph{How well the one-parameter model does.} With $f=0.76$ fitted on the 160\,GB, 48-session cell,
+Eq.~\eqref{eq:energy} predicts the 80\,GB tier at 962\,J (measured 958, two-round means), vLLM's 70\,GiB tier at 1,035 and 973\,J (measured 1,035
+and 973), and every other overloaded (48- and 96-session) synthetic Qwen3-32B host-tier cell within 1.4\% (2.5--3.4\% at 16
+sessions), except one: 160\,GB at 48 sessions with 30\,s pauses, where it
+predicts 534\,J and we measured 614\,J ($-13\%$). That cell drew 563\,W on average against 578\,W with 5\,s pauses: idle time likely dilutes
+the prefill share, which the model, built for a busy card, does not capture; Section~\ref{sec:production} shows the same limit on production traffic at light load. On Qwen3-8B it predicts 207 and 254\,J for the 160\,GB tier at
+128 and 256 sessions, against 215 and 266\,J measured ($-4$ to $-5\%$). On recorded trajectories,
+where the GPU cache never thrashed, with no cache taken as $E_{\text{thrash}}$, it predicts the 160\,GB tier 6--23\% below the
+measured energy per turn, so the fit does not transfer to those workloads.
+
+\paragraph{Host cost.} We could not read the host's energy counters. From the engines' CPU time (charged at 10\,W per
+busy core) and the bytes moved (assuming 1\,nJ per byte of host memory traffic) we estimate, under these assumed coefficients, the host's extra energy, as a
+share of the GPU energy saved, at 0.5--1.8\% for the 160\,GB tier at 48 and 96 sessions and 2.9--3.0\% for 80\,GB at 48;
+where the GPU saving was small the same estimate is larger: 11--14\% for SGLang tiers at 16 sessions and for 80\,GB at
+96, 128\% for 80\,GB at 16 sessions with 30\,s pauses, and 4.7--212\% for vLLM's 70\,GiB tier. Mao and Zhou bounded the host-side cost at below 1\% of the GPU saving on a
+similar host~\cite{mao2026offloading}.

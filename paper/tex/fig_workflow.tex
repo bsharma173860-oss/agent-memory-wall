@@ -1,0 +1,57 @@
+\begin{figure*}[t]
+\centering
+\frenchspacing
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={draw, rounded corners=2pt, align=center, inner sep=3pt, minimum height=0.62cm,
+    execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
+  dark/.style={box, fill=black, text=white},
+  grey/.style={box, fill=black!12},
+  light/.style={box, fill=white},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  head/.style={font=\scriptsize\bfseries, align=left}
+]
+% ---------- workloads
+\node[head] at (1.75,3.3) {WORKLOADS};
+\node[light, text width=3.6cm] (w1) at (1.75,2.65) {synthetic sessions ($\sim$11k and $\sim$27k tokens)};
+\node[light, text width=3.6cm] (w2) at (1.75,1.8) {400 SWE-agent trajectories};
+\node[light, text width=3.6cm] (w3) at (1.75,0.95) {Kimi tool-agent trace (23,608 requests)};
+\node[light, text width=3.6cm] (w4) at (1.75,0.1) {BFCL v4 (400 graded tasks)};
+\node[grey, text width=2.2cm] (same) at (5.75,1.42) {identical prompts (BFCL: tasks) for every policy};
+\foreach \i in {1,2,3,4} \draw[arr] (w\i.east) -- ++(0.35,0) |- (same.west);
+
+% ---------- policies
+\node[head] at (9.8,3.3) {POLICIES};
+\node[light, text width=4.5cm] (p1) at (9.8,2.65) {no cache; GPU cache};
+\node[light, text width=4.5cm] (p2) at (9.8,1.8) {host tier: vLLM 70\,GiB; SGLang 80--300\,GB (WT, WB)};
+\node[light, text width=4.5cm] (p3) at (9.8,0.95) {LRU, LFU, SLRU eviction};
+\node[light, text width=4.5cm] (p4) at (9.8,0.1) {gates: static, formulas, adaptive};
+\foreach \i in {1,2,3,4} \draw[arr] (same.east) -- ++(0.12,0) |- (p\i.west);
+
+% ---------- engine, predictions, measurement
+\node[box, dashed, text width=3.6cm] (pre) at (14.75,2.55) {28 predictions, written before the runs};
+\node[dark, text width=3.6cm] (eng) at (14.75,1.42) {vLLM 0.33, SGLang 0.5.23\\on an H200 NVL};
+\node[grey, text width=3.6cm] (meas) at (14.75,0.3) {GPU joules (NVML), hits, turns, TTFT, accuracy};
+\foreach \i in {1,2,3,4} \draw[arr] (p\i.east) -- ++(0.12,0) |- (eng.west);
+\draw[arr, dashed] (pre) -- (eng);
+\draw[arr] (eng) -- (meas);
+
+% ---------- results
+\node[head, anchor=west] at (-0.15,-0.62) {RESULTS};
+\draw[thick] (meas.south) -- (14.75,-0.85);
+\draw[thick] (1.08,-0.85) -- (15.43,-0.85);
+\foreach \x/\s/\t [count=\j] in {1.08/{\ref{sec:cost}}/{cost of a token},
+                      3.95/{\ref{sec:cliff}}/{cliff and memory wall},
+                      6.82/{\ref{sec:tiers}}/{host tiers},
+                      9.69/{\ref{sec:production}}/{production replay},
+                      12.56/{\ref{sec:control}}/{admission gate},
+                      15.43/{\ref{sec:accuracy}}/{correct per kWh}} {
+  \node[box, dashed, text width=2.25cm, minimum height=0.85cm, anchor=north, font=\scriptsize] (r\j) at (\x,-1.15) {\textbf{Section~\s}\strut\\\t\strut};
+  \draw[arr] (\x,-0.85) -- (r\j.north);
+}
+\end{tikzpicture}
+\caption{Method. Four workloads, from controlled to real, are sent with identical prompts (for BFCL, identical tasks) to every policy on two
+engines and one GPU type\@. Every run records GPU energy from the NVML counter, cache hits, completed turns or requests,
+latency and, for BFCL, graded accuracy. Each prediction was written before its run (Appendix~\ref{app:prereg}). WT/WB: write-through/write-back host tier; LFU/SLRU: least-frequently-used/segmented-LRU eviction; TTFT: time to first token.}
+\label{fig:workflow}
+\end{figure*}

@@ -1,0 +1,47 @@
+[
+ {
+  "name": "vllm-gpu-mc",
+  "engine": "vllm",
+  "policy": "gpu-only",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": []
+ },
+ {
+  "name": "vllm-nocache-mc",
+  "engine": "vllm",
+  "policy": "recompute",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [
+   "--disable-prefix-caching"
+  ]
+ },
+ {
+  "name": "sglang-gpu-mc",
+  "engine": "sglang",
+  "policy": "gpu-only",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": []
+ },
+ {
+  "name": "sglang-host160-mc",
+  "engine": "sglang",
+  "policy": "offload",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "160"
+  ]
+ },
+ {
+  "name": "sglang-host300-mc",
+  "engine": "sglang",
+  "policy": "offload",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "300"
+  ]
+ }
+]

@@ -1,0 +1,8 @@
+[
+  {"name": "vllm-default",   "engine": "vllm",   "python": "/workspace/venv-vllm/bin/python",   "flags": []},
+  {"name": "vllm-tuned",     "engine": "vllm",   "python": "/workspace/venv-vllm/bin/python",
+   "flags": ["--max-num-batched-tokens", "16384", "--max-num-seqs", "256"]},
+  {"name": "sglang-default", "engine": "sglang", "python": "/workspace/venv-sglang/bin/python", "flags": []},
+  {"name": "sglang-tuned",   "engine": "sglang", "python": "/workspace/venv-sglang/bin/python",
+   "flags": ["--chunked-prefill-size", "16384", "--max-running-requests", "256", "--schedule-policy", "lpm"]}
+]

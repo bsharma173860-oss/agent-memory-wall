@@ -1,0 +1,50 @@
+[
+ {
+  "name": "vllm-gpu-8b",
+  "engine": "vllm",
+  "policy": "gpu-only",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": []
+ },
+ {
+  "name": "vllm-nocache-8b",
+  "engine": "vllm",
+  "policy": "recompute",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [
+   "--disable-prefix-caching"
+  ]
+ },
+ {
+  "name": "sglang-gpu-8b",
+  "engine": "sglang",
+  "policy": "gpu-only",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": []
+ },
+ {
+  "name": "sglang-host160-8b",
+  "engine": "sglang",
+  "policy": "offload",
+  "python": "/workspace/venv-sglang/bin/python",
+  "flags": [
+   "--enable-hierarchical-cache",
+   "--hicache-size",
+   "160"
+  ]
+ },
+ {
+  "name": "vllm-formula-8b",
+  "engine": "vllm",
+  "policy": "formula",
+  "python": "/workspace/venv-vllm/bin/python",
+  "flags": [],
+  "admit": {
+   "mode": "formula",
+   "turns": 4,
+   "safety": 0.9,
+   "growth": 600,
+   "interval": 2
+  }
+ }
+]
